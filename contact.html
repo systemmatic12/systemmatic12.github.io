@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Neron</title>
+    <style>
+        :root { --sidebar-width: 260px; --accent: #6366f1; --bg: #f8fafc; }
+        body { font-family: sans-serif; display: flex; margin: 0; background: var(--bg); }
+        nav { width: var(--sidebar-width); background: #fff; height: 100vh; padding: 2.5rem; position: fixed; border-right: 1px solid #e2e8f0; }
+        nav a { color: #64748b; text-decoration: none; display: block; margin-bottom: 1.2rem; font-weight: 600; }
+        nav a:hover { color: var(--accent); }
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 4rem; display: flex; justify-content: center; align-items: center; }
+        .form-card { background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 500px; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0 20px 0; border: 1px solid #e2e8f0; border-radius: 8px; }
+        button { background: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index">← Home</a>
+        <h2 style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 20px;">Contact</h2>
+        <a href="contact" style="color:var(--accent)">Message Me</a>
+    </nav>
+    <main>
+        <div class="form-card">
+            <h1>Message Me</h1>
+            <form action="https://formspree.io/f/mzdggqqd" method="POST">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
