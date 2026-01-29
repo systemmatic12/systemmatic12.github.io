@@ -2,49 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Hub</title>
+    <title>Neron's Games</title>
     <style>
-        :root { --sidebar-width: 250px; --accent: #6366f1; --bg: #f8fafc; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
-
-        /* Sidebar */
-        nav {
-            width: var(--sidebar-width);
-            background: #fff;
-            border-right: 1px solid #e2e8f0;
-            padding: 2rem;
-            position: fixed;
-            height: 100vh;
-        }
-        nav h2 { font-size: 0.9rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 1.5rem; }
-        nav ul { list-style: none; }
-        nav li { margin-bottom: 1rem; }
-        /* These links point to your other files */
-        nav a { text-decoration: none; color: #1e293b; font-weight: 600; }
-        nav a:hover { color: var(--accent); }
-
-        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 4rem; }
-        .hero { max-width: 1000px; margin: 0 auto; background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        /* Keeping the same sidebar style */
+        body { font-family: sans-serif; display: flex; margin: 0; background: #0f172a; color: white; }
+        nav { width: 260px; background: #1e293b; height: 100vh; padding: 2.5rem; position: fixed; border-right: 1px solid #334155; }
+        nav a { color: #94a3b8; text-decoration: none; display: block; margin-bottom: 1.2rem; font-weight: 600; }
+        nav a:hover { color: #6366f1; }
+        
+        main { margin-left: 260px; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        canvas { background: #000; border: 5px solid #334155; border-radius: 10px; box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
     </style>
 </head>
 <body>
-
     <nav>
-        <h2>Navigation</h2>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="games.html">Games</a></li> <li><a href="contact.html">Contact</a></li>
-        </ul>
+        <a href="index">← Home</a>
+        <h2 style="color:white; font-size: 0.8rem; text-transform: uppercase; margin-top: 20px;">Game Library</h2>
+        <a href="games" style="color:#6366f1">Pong</a>
     </nav>
 
     <main>
-        <div class="hero">
-            <h1>Welcome to My Site</h1>
-            <p>Click "Games" in the sidebar to play Pong!</p>
-        </div>
+        <h1 style="margin-bottom: 20px;">PONG</h1>
+        <canvas id="pong" width="600" height="400"></canvas>
+        <p style="margin-top: 20px; color: #94a3b8;">Move your mouse to control the left paddle!</p>
     </main>
 
+    <script>
+        const canvas = document.getElementById("pong");
+        const ctx = canvas.getContext("2d");
+        let ball = { x: 300, y: 200, dx: 5, dy: 5, r: 8 };
+        let player = { y: 150, h: 80, w: 10 };
+        let cpu = { y: 150, h: 80, w: 10 };
+
+        canvas.addEventListener("mousemove", (e) => {
+            let rect = canvas.getBoundingClientRect();
+            player.y = e.clientY - rect.top - player.h / 2;
+        });
+
+        function update() {
+            ball.x += ball.dx; ball.y += ball.dy;
+            if (ball.y <= 0 || ball.y >= 400) ball.dy *= -1;
+            
+            // Simple CPU AI
+            cpu.y += (ball.y - (cpu.y + cpu.h/2)) * 0.1;
+
+            // Collision
+            if (ball.x < 30 && ball.y > player.y && ball.y < player.y + player.h) ball.dx *= -1;
+            if (ball.x > 570 && ball.y > cpu.y && ball.y < cpu.y + cpu.h) ball.dx *= -1;
+
+            if (ball.x < 0 || ball.x > 600) { ball.x = 300; ball.dx *= -1; }
+        }
+
+        function draw() {
+            ctx.fillStyle = "black"; ctx.fillRect(0,0,600,400);
+            ctx.fillStyle = "white";
+            ctx.fillRect(10, player.y, player.w, player.h); // Player
+            ctx.fillRect(580, cpu.y, cpu.w, cpu.h); // CPU
+            ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill(); // Ball
+            update();
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
 </body>
 </html>
