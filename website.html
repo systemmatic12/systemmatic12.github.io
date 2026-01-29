@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Modern Hub</title>
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --accent: #6366f1; /* Modern Indigo */
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex; /* Creates the side-by-side layout */
+            min-height: 100vh;
+        }
+
+        /* Fixed Sidebar */
+        nav {
+            width: var(--sidebar-width);
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed; /* Keeps sidebar in place while scrolling */
+            height: 100vh;
+        }
+
+        nav h2 {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            margin-bottom: 2rem;
+            color: var(--accent);
+        }
+
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1rem; }
+
+        nav a {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav a:hover { color: var(--accent); }
+
+        /* Main Content Area */
+        main {
+            margin-left: var(--sidebar-width); /* Prevents content from going under sidebar */
+            flex-grow: 1;
+            padding: 4rem;
+            width: 100%;
+        }
+
+        .hero {
+            max-width: 1200px; /* Limits width slightly for readability on ultra-wide screens */
+            margin: 0 auto;
+        }
+
+        .header-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 3rem;
+        }
+
+        h1 { font-size: 3.5rem; margin-bottom: 1rem; line-height: 1.1; }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; }
+            main { margin-left: 0; padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#home">Games</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#about">About Me</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="header-box">
+                <h1>Hi, I'm Neron! :).</h1>
+                <p style="font-size: 1.25rem; color: #64748b;">
+                    Welcome to my corner of the web. I've always wanted to have my own land on the internet and I can finally do that so that's awesome.
+                </p>
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <h3>My Story</h3>
+                    <p>This is where I'm just going to write stuff about my life in my days If it's going to be talking about my hyperfixation or whatever, just expect the unexpected.</p>
+                </div>
+                <div class="card">
+                    <h3>What is this anyway?</h3>
+                    <p>my website.</p>
+                </div>
+                <div class="card">
+                    <h3>Latest</h3>
+                    <p>This is just going to be a summary of my day or whatever I had done.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>
