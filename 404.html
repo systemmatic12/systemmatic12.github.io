@@ -2,73 +2,140 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Page Not Found</title>
     <style>
-        :root { --accent: #6366f1; --bg: #0f172a; }
+        :root { 
+            --sidebar-width: 260px; 
+            --accent: #6366f1; 
+            --bg: #f8fafc; 
+            --text: #1e293b; 
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg); 
-            color: white; 
+            font-family: 'Inter', system-ui, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            display: flex; 
+            min-height: 100vh; 
+        }
+
+        /* Sidebar Navigation (Same as index.html) */
+        nav { 
+            width: var(--sidebar-width); 
+            background: #ffffff; 
+            border-right: 1px solid #e2e8f0; 
+            padding: 2.5rem; 
+            position: fixed; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        nav h2 { 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1rem; 
+            margin-bottom: 2rem; 
+            color: #94a3b8;
+        }
+
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1.2rem; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
+        nav a:hover { color: var(--accent); }
+
+        /* Main Content Area */
+        main { 
+            margin-left: var(--sidebar-width); 
+            flex-grow: 1; 
+            padding: 4rem; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            height: 100vh; 
-            margin: 0; 
+        }
+
+        .error-card { 
+            background: white; 
+            padding: 3.5rem; 
+            border-radius: 24px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            max-width: 600px; 
+            width: 100%;
             text-align: center;
         }
-        .container { max-width: 500px; padding: 2rem; }
-        h1 { font-size: 6rem; margin: 0; color: var(--accent); }
-        p { font-size: 1.2rem; color: #94a3b8; margin-bottom: 2rem; }
-        
-        /* The Secret Button */
+
+        h1 { font-size: 5rem; color: var(--accent); margin-bottom: 1rem; }
+        p { font-size: 1.2rem; color: #64748b; margin-bottom: 2rem; line-height: 1.6; }
+
+        /* Button & Form Styles */
         .request-btn {
             background: var(--accent);
             color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
             text-decoration: none;
             font-weight: bold;
             cursor: pointer;
             border: none;
-            transition: transform 0.2s;
+            font-size: 1rem;
+            transition: transform 0.2s, background 0.2s;
         }
-        .request-btn:hover { transform: scale(1.05); }
+        .request-btn:hover { transform: translateY(-2px); background: #4f46e5; }
 
-        /* Hidden Form - Shows when button is clicked */
-        #request-form { display: none; margin-top: 2rem; background: #1e293b; padding: 2rem; border-radius: 15px; }
+        #request-section { display: none; margin-top: 2rem; border-top: 1px solid #e2e8f0; padding-top: 2rem; }
+        
         input, textarea { 
-            width: 100%; padding: 10px; margin: 10px 0; 
-            border-radius: 5px; border: 1px solid #334155; 
-            background: #0f172a; color: white; 
+            width: 100%; padding: 12px; margin: 8px 0; 
+            border-radius: 8px; border: 1px solid #e2e8f0; 
+            background: #f8fafc; font-family: inherit;
         }
-        .back-link { display: block; margin-top: 2rem; color: #64748b; text-decoration: none; font-size: 0.9rem; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; padding: 1.5rem; }
+            main { margin-left: 0; padding: 2rem; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>404</h1>
-        <p>Looks like Neron hasn't built this part of the map yet.</p>
-        
-        <button class="request-btn" onclick="showForm()">Make this a website</button>
+    <nav>
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="index">Home</a></li>
+            <li><a href="games">Games</a></li>
+            <li><a href="contact">Contact</a></li>
+            <li><a href="guestbook">Guestbook</a></li>
+        </ul>
+    </nav>
 
-        <div id="request-form">
-            <h3>What should go here?</h3>
-            <form action="https://formspree.io/f/mzdggqqd" method="POST">
-                <input type="text" name="suggestion" placeholder="Your idea (e.g. A Flappy Bird clone)" required>
-                <textarea name="details" placeholder="Any details?" rows="3"></textarea>
-                <button type="submit" class="request-btn">Submit Request</button>
-            </form>
+    <main>
+        <div class="error-card">
+            <h1>404</h1>
+            <p>You've found a secret area! Neron hasn't built this page yet, but you can help change that.</p>
+            
+            <button class="request-btn" id="main-btn" onclick="showForm()">Make this a website</button>
+
+            <div id="request-section">
+                <h3 style="margin-bottom: 1rem;">What should I add here?</h3>
+                <form action="https://formspree.io/f/mzdggqqd" method="POST">
+                    <input type="text" name="idea" placeholder="Your idea (e.g., A music player)" required>
+                    <textarea name="message" placeholder="Any specific features?" rows="3"></textarea>
+                    <button type="submit" class="request-btn" style="width: 100%;">Send Suggestion</button>
+                </form>
+            </div>
         </div>
-
-        <a href="index.html" class="back-link">← Nevermind, take me home</a>
-    </div>
+    </main>
 
     <script>
         function showForm() {
-            document.getElementById('request-form').style.display = 'block';
-            document.querySelector('.request-btn').style.display = 'none';
+            document.getElementById('request-section').style.display = 'block';
+            document.getElementById('main-btn').style.display = 'none';
         }
     </script>
+
 </body>
 </html>
