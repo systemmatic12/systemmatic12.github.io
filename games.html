@@ -39,30 +39,21 @@
         function draw() {
             ctx.fillStyle = "black"; ctx.fillRect(0,0,600,400);
             ctx.fillStyle = "white";
-            
-            // Render Ball
             ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
-            
-            // Render Player Paddle (Left)
-            ctx.fillRect(10, player.y, player.w, player.h);
-            
-            // Render CPU Paddle (Right)
-            ctx.fillRect(580, cpu.y, cpu.w, cpu.h);
+            ctx.fillRect(10, player.y, player.w, player.h); // Left
+            ctx.fillRect(580, cpu.y, cpu.w, cpu.h); // Right (AI)
 
-            // Ball Logic
             ball.x += ball.dx; ball.y += ball.dy;
             if (ball.y - ball.r <= 0 || ball.y + ball.r >= 400) ball.dy *= -1;
 
-            // CPU AI Logic
+            // Simple AI
             let cpuCenter = cpu.y + cpu.h/2;
             if (cpuCenter < ball.y - 35) cpu.y += 6;
             else if (cpuCenter > ball.y + 35) cpu.y -= 6;
 
-            // Collision
             if (ball.x - ball.r <= 20 && ball.y > player.y && ball.y < player.y + player.h) ball.dx = Math.abs(ball.dx);
             if (ball.x + ball.r >= 580 && ball.y > cpu.y && ball.y < cpu.y + cpu.h) ball.dx = -Math.abs(ball.dx);
 
-            // Reset
             if (ball.x < 0 || ball.x > 600) { ball.x = 300; ball.y = 200; ball.dx *= -1; }
             requestAnimationFrame(draw);
         }
