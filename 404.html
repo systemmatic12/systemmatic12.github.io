@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404 - Page Not Found</title>
+    <style>
+        :root { --accent: #6366f1; --bg: #0f172a; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            text-align: center;
+        }
+        .container { max-width: 500px; padding: 2rem; }
+        h1 { font-size: 6rem; margin: 0; color: var(--accent); }
+        p { font-size: 1.2rem; color: #94a3b8; margin-bottom: 2rem; }
+        
+        /* The Secret Button */
+        .request-btn {
+            background: var(--accent);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s;
+        }
+        .request-btn:hover { transform: scale(1.05); }
+
+        /* Hidden Form - Shows when button is clicked */
+        #request-form { display: none; margin-top: 2rem; background: #1e293b; padding: 2rem; border-radius: 15px; }
+        input, textarea { 
+            width: 100%; padding: 10px; margin: 10px 0; 
+            border-radius: 5px; border: 1px solid #334155; 
+            background: #0f172a; color: white; 
+        }
+        .back-link { display: block; margin-top: 2rem; color: #64748b; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>404</h1>
+        <p>Looks like Neron hasn't built this part of the map yet.</p>
+        
+        <button class="request-btn" onclick="showForm()">Make this a website</button>
+
+        <div id="request-form">
+            <h3>What should go here?</h3>
+            <form action="https://formspree.io/f/mzdggqqd" method="POST">
+                <input type="text" name="suggestion" placeholder="Your idea (e.g. A Flappy Bird clone)" required>
+                <textarea name="details" placeholder="Any details?" rows="3"></textarea>
+                <button type="submit" class="request-btn">Submit Request</button>
+            </form>
+        </div>
+
+        <a href="index.html" class="back-link">← Nevermind, take me home</a>
+    </div>
+
+    <script>
+        function showForm() {
+            document.getElementById('request-form').style.display = 'block';
+            document.querySelector('.request-btn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
