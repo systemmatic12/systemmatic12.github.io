@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Neron's Guestbook</title>
+    <style>
+        :root { --sidebar-width: 260px; --accent: #6366f1; --bg: #f8fafc; }
+        body { font-family: sans-serif; display: flex; margin: 0; background: var(--bg); }
+        
+        nav { 
+            width: var(--sidebar-width); background: #fff; height: 100vh; 
+            padding: 2.5rem; position: fixed; border-right: 1px solid #e2e8f0; 
+        }
+        nav a { color: #64748b; text-decoration: none; display: block; margin-bottom: 1.2rem; font-weight: 600; }
+        nav a:hover { color: var(--accent); }
+        
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 4rem; display: flex; justify-content: center; }
+        .content-box { background: white; padding: 3rem; border-radius: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 800px; }
+        
+        h1 { margin-bottom: 1rem; color: #0f172a; }
+        p { color: #64748b; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index">← Home</a>
+        <h2 style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 20px;">Social</h2>
+        <a href="guestbook" style="color:var(--accent)">Guestbook</a>
+        <a href="contact">Contact</a>
+    </nav>
+
+    <main>
+        <div class="content-box">
+            <h1>Guestbook</h1>
+            <p>Leave a message for the world to see! (I'll review them before they go live).</p>
+
+            <div id="cusdis_thread"
+              data-host="https://cusdis.com"
+              data-app-id="REPLACE_THIS_WITH_YOUR_ID"
+              data-page-id="guestbook"
+              data-page-url="https://yourusername.github.io/guestbook"
+              data-page-title="Guestbook"
+            ></div>
+            <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+        </div>
+    </main>
+
+</body>
+</html>
