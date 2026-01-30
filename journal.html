@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Neron's Journal</title>
+    <style>
+        :root { --sidebar-width: 260px; --accent: #6366f1; --bg: #f8fafc; }
+        body { font-family: sans-serif; display: flex; margin: 0; background: var(--bg); }
+        nav { width: var(--sidebar-width); background: #fff; height: 100vh; padding: 2.5rem; position: fixed; border-right: 1px solid #e2e8f0; }
+        nav a { color: #64748b; text-decoration: none; display: block; margin-bottom: 1.2rem; font-weight: 600; }
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 4rem; display: flex; flex-direction: column; align-items: center; }
+        .post { background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 800px; width: 100%; margin-bottom: 2.5rem; border-left: 5px solid var(--accent); }
+        .date { font-weight: bold; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index">← Back Home</a>
+        <h2 style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 20px;">Writing</h2>
+        <a href="journal" style="color:var(--accent)">Journal</a>
+    </nav>
+    <main>
+        <h1 style="font-size: 2.5rem; margin-bottom: 2rem;">My Journal</h1>
+        
+        <article class="post">
+            <span class="date">January 30, 2026</span>
+            <h2>Entry #1: The Hover Effect</h2>
+            <p>I finally got the hover effects working on the home page cards. Only I can edit this file on GitHub, so it's my private spot to talk about whatever.</p>
+        </article>
+    </main>
+</body>
+</html>
