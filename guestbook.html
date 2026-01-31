@@ -38,25 +38,29 @@
         nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
         nav a:hover { color: var(--accent); }
 
-        /* Main Content Area */
+        /* Main Content */
         main { 
             margin-left: var(--sidebar-width); 
             flex-grow: 1; 
             padding: 3rem; 
+            max-width: 1000px;
         }
 
-        .guestbook-container {
-            max-width: 800px;
-            margin: 0 auto;
+        .guestbook-header { margin-bottom: 2rem; }
+        h1 { font-size: 2.5rem; color: #0f172a; }
+
+        /* --- THE CUSDIS FIX --- */
+        #cusdis_thread {
             background: white;
-            padding: 2.5rem;
-            border-radius: 24px;
+            padding: 2rem;
+            border-radius: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            /* This forces the widget to be tall so the scrollbar disappears */
+            min-height: 800px; 
+            width: 100%;
         }
 
-        h1 { font-size: 2.5rem; color: #0f172a; margin-bottom: 1rem; }
-
-        /* --- THE MOBILE FIX --- */
+        /* Mobile Fix */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             nav { 
@@ -73,27 +77,28 @@
     <nav>
         <h2>Navigation</h2>
         <ul>
-            <li><a href="index">Home</a></li>
-            <li><a href="games">Games</a></li>
-            <li><a href="contact">Contact</a></li>
-            <li><a href="guestbook" style="color: var(--accent);">Guestbook</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="games.html">Games</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="guestbook.html" style="color: var(--accent);">Guestbook</a></li>
         </ul>
     </nav>
 
     <main>
-        <div class="guestbook-container">
+        <div class="guestbook-header">
             <h1>Guestbook</h1>
-            <p style="margin-bottom: 2rem; color: #64748b;">Leave a message below!</p>
+            <p>Your previous comments are safe! They are stored in your Cusdis account.</p>
+        </div>
 
-            <div id="cusdis_thread"
-              data-host="https://cusdis.com"
-              data-app-id="73595671-8785-489d-8386-7e47a9570144"
-              data-page-id="guestbook"
-              data-page-url="https://systemmatic12.github.io/guestbook"
-              data-page-title="Guestbook">
-            </div>
-            <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-            </div>
+        <div id="cusdis_thread"
+            data-host="https://cusdis.com"
+            data-app-id="PASTE_YOUR_APP_ID_HERE"
+            data-page-id="guestbook"
+            data-page-url="https://systemmatic12.github.io/guestbook.html"
+            data-page-title="Guestbook">
+        </div>
+        <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+
     </main>
 
 </body>
