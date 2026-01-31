@@ -2,103 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guestbook | Neron's Hub</title>
+    <title>Neron's Guestbook</title>
     <style>
-        :root { 
-            --sidebar-width: 260px; 
-            --accent: #6366f1; 
-            --bg: #f8fafc; 
-            --text: #1e293b; 
-        }
+        :root { --sidebar-width: 260px; --accent: #6366f1; --bg: #f8fafc; }
+        body { font-family: sans-serif; display: flex; margin: 0; background: var(--bg); }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            font-family: 'Inter', system-ui, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            display: flex; 
-            min-height: 100vh; 
-        }
-
-        /* Sidebar Navigation */
         nav { 
-            width: var(--sidebar-width); 
-            background: #ffffff; 
-            border-right: 1px solid #e2e8f0; 
-            padding: 2.5rem; 
-            position: fixed; 
-            height: 100vh; 
+            width: var(--sidebar-width); background: #fff; height: 100vh; 
+            padding: 2.5rem; position: fixed; border-right: 1px solid #e2e8f0; 
         }
-
-        nav h2 { font-size: 0.85rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 2rem; }
-        nav ul { list-style: none; }
-        nav li { margin-bottom: 1.2rem; }
-        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
+        nav a { color: #64748b; text-decoration: none; display: block; margin-bottom: 1.2rem; font-weight: 600; }
         nav a:hover { color: var(--accent); }
-
-        /* Main Content */
-        main { 
-            margin-left: var(--sidebar-width); 
-            flex-grow: 1; 
-            padding: 3rem; 
-            max-width: 1000px;
-        }
-
-        .guestbook-header { margin-bottom: 2rem; }
-        h1 { font-size: 2.5rem; color: #0f172a; }
-
-        /* --- THE CUSDIS FIX --- */
-        #cusdis_thread {
-            background: white;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            /* This forces the widget to be tall so the scrollbar disappears */
-            min-height: 800px; 
-            width: 100%;
-        }
-
-        /* Mobile Fix */
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            nav { 
-                width: 100%; height: auto; position: relative; 
-                padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0;
-            }
-            nav ul { display: flex; flex-wrap: wrap; gap: 15px; }
-            main { margin-left: 0; padding: 1.5rem; }
-        }
+        
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 4rem; display: flex; justify-content: center; }
+        .content-box { background: white; padding: 3rem; border-radius: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 800px; }
+        
+        h1 { margin-bottom: 1rem; color: #0f172a; }
+        p { color: #64748b; margin-bottom: 2rem; }
     </style>
 </head>
 <body>
 
     <nav>
-        <h2>Navigation</h2>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="games.html">Games</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="guestbook.html" style="color: var(--accent);">Guestbook</a></li>
-        </ul>
+        <a href="index">← Home</a>
+        <h2 style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 20px;">Social</h2>
+        <a href="guestbook" style="color:var(--accent)">Guestbook</a>
+        <a href="contact">Contact</a>
     </nav>
 
     <main>
-        <div class="guestbook-header">
+        <div class="content-box">
             <h1>Guestbook</h1>
-            <p>Your previous comments are safe! They are stored in your Cusdis account.</p>
-        </div>
+            <p>Leave a message for the world to see! (I'll review them before they go live).</p>
 
-        <div id="cusdis_thread"
-            data-host="https://cusdis.com"
-            data-app-id="PASTE_YOUR_APP_ID_HERE"
-            data-page-id="guestbook"
-            data-page-url="https://systemmatic12.github.io/guestbook.html"
-            data-page-title="Guestbook">
+            <div id="cusdis_thread"
+              data-host="https://cusdis.com"
+              data-app-id="734d988d-3923-4d5c-ae1b-ed287ae778ad"
+              data-page-id="guestbook"
+              data-page-url="https://systemmatic12.github.io/guestbook"
+              data-page-title="Guestbook"
+            ></div>
+            <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
         </div>
-        <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-
     </main>
 
 </body>
