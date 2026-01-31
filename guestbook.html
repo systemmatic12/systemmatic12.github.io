@@ -2,47 +2,145 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Neron's Guestbook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guestbook | Neron's Hub</title>
     <style>
-        :root { --sidebar-width: 260px; --accent: #6366f1; --bg: #f8fafc; }
-        body { font-family: sans-serif; display: flex; margin: 0; background: var(--bg); }
-        
-        nav { 
-            width: var(--sidebar-width); background: #fff; height: 100vh; 
-            padding: 2.5rem; position: fixed; border-right: 1px solid #e2e8f0; 
+        :root { 
+            --sidebar-width: 260px; 
+            --accent: #6366f1; 
+            --bg: #f8fafc; 
+            --text: #1e293b; 
         }
-        nav a { color: #64748b; text-decoration: none; display: block; margin-bottom: 1.2rem; font-weight: 600; }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            display: flex; 
+            min-height: 100vh; 
+        }
+
+        /* Sidebar Navigation */
+        nav { 
+            width: var(--sidebar-width); 
+            background: #ffffff; 
+            border-right: 1px solid #e2e8f0; 
+            padding: 2.5rem; 
+            position: fixed; 
+            height: 100vh; 
+        }
+
+        nav h2 { font-size: 0.85rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 2rem; }
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1.2rem; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
         nav a:hover { color: var(--accent); }
-        
-        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 4rem; display: flex; justify-content: center; }
-        .content-box { background: white; padding: 3rem; border-radius: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 800px; }
-        
-        h1 { margin-bottom: 1rem; color: #0f172a; }
-        p { color: #64748b; margin-bottom: 2rem; }
+
+        /* Main Content Area */
+        main { 
+            margin-left: var(--sidebar-width); 
+            flex-grow: 1; 
+            padding: 3rem; 
+            max-width: 1000px;
+        }
+
+        .guestbook-header { margin-bottom: 2rem; }
+        h1 { font-size: 2.5rem; color: #0f172a; margin-bottom: 0.5rem; }
+
+        /* Comment Form */
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 3rem;
+        }
+
+        input, textarea {
+            width: 100%; padding: 12px; margin-bottom: 1rem;
+            border: 1px solid #e2e8f0; border-radius: 8px;
+            font-family: inherit; background: #fcfcfc;
+        }
+
+        .submit-btn {
+            background: var(--accent); color: white; border: none;
+            padding: 12px 24px; border-radius: 8px; font-weight: bold;
+            cursor: pointer; width: 100%; transition: 0.2s;
+        }
+        .submit-btn:hover { background: #4f46e5; }
+
+        /* --- THE FIXED COMMENT FEED --- */
+        .comments-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem; /* Space between comments */
+            height: auto; /* No fixed height = no tiny scroll box! */
+        }
+
+        .comment-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .comment-card strong { color: var(--accent); display: block; margin-bottom: 0.5rem; }
+        .comment-card p { color: #475569; line-height: 1.5; word-wrap: break-word; }
+
+        /* --- THE MOBILE FIX --- */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { 
+                width: 100%; height: auto; position: relative; 
+                padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0;
+            }
+            nav ul { display: flex; flex-wrap: wrap; gap: 15px; }
+            main { margin-left: 0; padding: 1.5rem; }
+            h1 { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
 
     <nav>
-        <a href="index">← Home</a>
-        <h2 style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 20px;">Social</h2>
-        <a href="guestbook" style="color:var(--accent)">Guestbook</a>
-        <a href="contact">Contact</a>
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="index">Home</a></li>
+            <li><a href="games">Games</a></li>
+            <li><a href="contact">Contact</a></li>
+            <li><a href="guestbook" style="color: var(--accent);">Guestbook</a></li>
+        </ul>
     </nav>
 
     <main>
-        <div class="content-box">
+        <div class="guestbook-header">
             <h1>Guestbook</h1>
-            <p>Leave a message for the world to see! (I'll review them before they go live).</p>
+            <p>Leave a message for the world to see!</p>
+        </div>
 
-            <div id="cusdis_thread"
-              data-host="https://cusdis.com"
-              data-app-id="734d988d-3923-4d5c-ae1b-ed287ae778ad"
-              data-page-id="guestbook"
-              data-page-url="https://systemmatic12.github.io/guestbook"
-              data-page-title="Guestbook"
-            ></div>
-            <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+        <div class="form-container">
+            <form action="https://formspree.io/f/mzdggqqd" method="POST">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <textarea name="message" placeholder="What's on your mind?" rows="4" required></textarea>
+                <button type="submit" class="submit-btn">Sign the Guestbook</button>
+            </form>
+        </div>
+
+        <div class="comments-feed">
+            <h2>Messages</h2>
+
+            <div class="comment-card">
+                <strong>Admin (Neron)</strong>
+                <p>Welcome to the new guestbook layout! It's now much easier to read everyone's messages.</p>
+            </div>
+
+            <div class="comment-card">
+                <strong>Sample Guest</strong>
+                <p>Wow, the scrolling on this page is so much better now. No more tiny boxes!</p>
+            </div>
         </div>
     </main>
 
