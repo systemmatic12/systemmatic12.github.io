@@ -2,62 +2,169 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Neron's Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade | Neron's Hub</title>
     <style>
-        :root { --sidebar-width: 260px; --accent: #6366f1; }
-        body { font-family: sans-serif; display: flex; margin: 0; background: #0f172a; color: white; }
-        nav { width: var(--sidebar-width); background: #1e293b; height: 100vh; padding: 2.5rem; position: fixed; border-right: 1px solid #334155; }
-        nav a { color: #94a3b8; text-decoration: none; display: block; margin-bottom: 1.2rem; font-weight: 600; }
+        :root { 
+            --sidebar-width: 260px; 
+            --accent: #6366f1; 
+            --bg: #f8fafc; 
+            --text: #1e293b; 
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        /* Sidebar Navigation */
+        nav { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid #e2e8f0; padding: 2.5rem; position: fixed; height: 100vh; }
+        nav h2 { font-size: 0.85rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 2rem; }
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1.2rem; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
         nav a:hover { color: var(--accent); }
-        main { margin-left: var(--sidebar-width); flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-        canvas { background: #000; border: 4px solid #334155; border-radius: 8px; cursor: none; }
+
+        /* Main Content */
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 3rem; }
+        h1 { font-size: 2.5rem; color: #0f172a; margin-bottom: 1rem; }
+        .description { color: #64748b; margin-bottom: 3rem; font-size: 1.1rem; }
+
+        /* --- THE GAMES GRID --- */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #e2e880;
+            transition: 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 12px 24px rgba(99, 102, 241, 0.1);
+        }
+
+        /* The Game "Screen" */
+        .game-preview {
+            width: 100%;
+            height: 200px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .game-info { padding: 1.5rem; flex-grow: 1; }
+        .game-info h3 { margin-bottom: 0.5rem; color: #0f172a; }
+        .game-info p { font-size: 0.9rem; color: #64748b; margin-bottom: 1.5rem; }
+
+        .play-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .play-btn:hover { background: #4f46e5; }
+
+        /* Mobile Fix */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0; }
+            nav ul { display: flex; flex-wrap: wrap; gap: 15px; }
+            main { margin-left: 0; padding: 1.5rem; }
+            .games-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
+
     <nav>
-        <a href="index">← Home</a>
-        <h2 style="color:white; font-size: 0.8rem; text-transform: uppercase; margin-top: 20px;">Games</h2>
-        <a href="games" style="color:var(--accent)">Pong</a>
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="games.html" style="color: var(--accent);">Games</a></li>
+            <li><a href="media.html">Media</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="guestbook.html">Guestbook</a></li>
+        </ul>
     </nav>
+
     <main>
-        <h1>PONG</h1>
-        <canvas id="pong" width="600" height="400"></canvas>
-        <p style="margin-top: 20px; color: #94a3b8;">Use your mouse to move the left paddle!</p>
+        <h1>Neron's Arcade</h1>
+        <p class="description">A collection of games I've built or am hosting. More coming soon!</p>
+
+        <div class="games-grid">
+            
+            <div class="game-card">
+                <div class="game-preview" style="background: #000;">PONG AI</div>
+                <div class="game-info">
+                    <h3>AI Pong</h3>
+                    <p>Can you beat the computer? This AI learns as you play.</p>
+                    <a href="pong-game.html" class="play-btn">Play Now</a>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="game-preview" style="background: #22c55e;">SNAKE RETRO</div>
+                <div class="game-info">
+                    <h3>Retro Snake</h3>
+                    <p>The classic Nokia game. Eat the apples, don't hit the walls.</p>
+                    <a href="snake.html" class="play-btn">Play Now</a>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="game-preview" style="background: #ef4444;">BREAKOUT</div>
+                <div class="game-info">
+                    <h3>Brick Breaker</h3>
+                    <p>Destroy all the bricks to clear the level. Watch out for power-ups!</p>
+                    <a href="breakout.html" class="play-btn">Play Now</a>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="game-preview" style="background: #edc22e;">2048</div>
+                <div class="game-info">
+                    <h3>2048 Clone</h3>
+                    <p>Combine the numbers to reach the 2048 tile. It's harder than it looks.</p>
+                    <a href="2048.html" class="play-btn">Play Now</a>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="game-preview" style="background: #3b82f6;">INVADERS</div>
+                <div class="game-info">
+                    <h3>Space Invaders</h3>
+                    <p>Defend the Earth from waves of alien attackers.</p>
+                    <a href="invaders.html" class="play-btn">Play Now</a>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="game-preview" style="background: #a855f7;">MEMORY</div>
+                <div class="game-info">
+                    <h3>Memory Match</h3>
+                    <p>Test your brain! Find the matching pairs as fast as you can.</p>
+                    <a href="memory.html" class="play-btn">Play Now</a>
+                </div>
+            </div>
+
+        </div>
     </main>
-    <script>
-        const canvas = document.getElementById("pong");
-        const ctx = canvas.getContext("2d");
-        let ball = { x: 300, y: 200, dx: 5, dy: 5, r: 8 };
-        let player = { y: 150, h: 80, w: 10 };
-        let cpu = { y: 150, h: 80, w: 10 };
 
-        canvas.addEventListener("mousemove", (e) => {
-            let rect = canvas.getBoundingClientRect();
-            player.y = e.clientY - rect.top - player.h / 2;
-        });
-
-        function draw() {
-            ctx.fillStyle = "black"; ctx.fillRect(0,0,600,400);
-            ctx.fillStyle = "white";
-            ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
-            ctx.fillRect(10, player.y, player.w, player.h); // Left
-            ctx.fillRect(580, cpu.y, cpu.w, cpu.h); // Right (AI)
-
-            ball.x += ball.dx; ball.y += ball.dy;
-            if (ball.y - ball.r <= 0 || ball.y + ball.r >= 400) ball.dy *= -1;
-
-            // Simple AI
-            let cpuCenter = cpu.y + cpu.h/2;
-            if (cpuCenter < ball.y - 35) cpu.y += 6;
-            else if (cpuCenter > ball.y + 35) cpu.y -= 6;
-
-            if (ball.x - ball.r <= 20 && ball.y > player.y && ball.y < player.y + player.h) ball.dx = Math.abs(ball.dx);
-            if (ball.x + ball.r >= 580 && ball.y > cpu.y && ball.y < cpu.y + cpu.h) ball.dx = -Math.abs(ball.dx);
-
-            if (ball.x < 0 || ball.x > 600) { ball.x = 300; ball.y = 200; ball.dx *= -1; }
-            requestAnimationFrame(draw);
-        }
-        draw();
-    </script>
 </body>
 </html>
