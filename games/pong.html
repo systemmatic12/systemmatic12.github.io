@@ -83,17 +83,44 @@
             ctx.setLineDash([]); // Reset dash
         }
 
-        function update() {
-            // Move Player
+function update() {
+            // 1. Move Player Paddle
             user.y += user.dy;
             if(user.y < 0) user.y = 0;
             if(user.y > canvas.height - paddleHeight) user.y = canvas.height - paddleHeight;
 
-            // Move Ball
+            // 2. Move Ball
             ball.x += ball.dx; ball.y += ball.dy;
+
+            // 3. AI Logic (The Fix is here!)
+            let comLevel = 0.06; // We define the "Difficulty" here
+            
+            // AI only reacts when the ball is on its side (passed the halfway point)
             if(ball.x > canvas.width / 2) {
-    com.y += (ball.y - (com.y + paddleHeight/2)) * comLevel;
-}
+                com.y += (ball.y - (com.y + paddleHeight/2)) * comLevel;
+            }
+
+            // 4. Wall bounce (Top & Bottom)
+            if(ball.y + ball.r > canvas.height || ball.y - ball.r < 0) ball.dy = -ball.dy;
+
+            // 5. Paddle collision logic
+            let player = (ball.x < canvas.width/2) ? user : com;
+            if(ball.x + ball.r > player.x && ball.x - ball.r < player.x + paddleWidth && 
+               ball.y > player.y && ball.y < player.y + paddleHeight) {
+                
+                let collidePoint = (ball.y - (player.y + paddleHeight/2)) / (paddleHeight/2);
+                let angleRad = (Math.PI/4) * collidePoint;
+                let direction = (ball.x < canvas.width/2) ? 1 : -1;
+                
+                ball.dx = direction * ball.speed * Math.cos(angleRad);
+                ball.dy = ball.speed * Math.sin(angleRad);
+                ball.speed += 0.3; 
+            }
+
+            // 6. Scoring
+            if(ball.x - ball.r < 0) { cScore++; document.getElementById("cScore").innerText = cScore; resetBall(); }
+            if(ball.x + ball.r > canvas.width) { pScore++; document.getElementById("pScore").innerText = pScore; resetBall(); }
+        }
 
             // AI Logic (Right Paddle)
             let comLevel = 0.06; 
