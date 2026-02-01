@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048 | Neron's Hub</title>
+    <style>
+        :root { --sidebar-width: 260px; --accent: #f97316; --bg: #fff7ed; --text: #431407; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow: hidden; }
+        
+        /* Sidebar Navigation */
+        nav { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid #ffedd5; padding: 2.5rem; position: fixed; height: 100vh; }
+        nav h2 { font-size: 0.8rem; color: #9a3412; letter-spacing: 1px; margin-bottom: 2rem; }
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1.2rem; }
+        nav a { text-decoration: none; color: #c2410c; font-weight: 600; }
+
+        /* Main Content */
+        main { margin-left: var(--sidebar-width); flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        .game-header { width: 400px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .score-container { background: #ffedd5; padding: 10px 20px; border-radius: 8px; text-align: center; }
+        .score-label { font-size: 0.7rem; font-weight: bold; color: #9a3412; display: block; }
+        .score-value { font-size: 1.5rem; font-weight: bold; }
+
+        #grid { 
+            width: 400px; height: 400px; background: #fed7aa; border-radius: 10px; 
+            display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); 
+            gap: 15px; padding: 15px; position: relative;
+        }
+
+        .tile { 
+            width: 80px; height: 80px; background: #ffedd5; border-radius: 5px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 2rem; font-weight: bold; transition: all 0.1s ease-in-out;
+        }
+
+        /* Tile Colors based on value */
+        .tile-2 { background: #fffaf0; color: #7c2d12; }
+        .tile-4 { background: #ffedd5; color: #7c2d12; }
+        .tile-8 { background: #fed7aa; color: #fff; }
+        .tile-16 { background: #fb923c; color: #fff; }
+        .tile-32 { background: #f97316; color: #fff; }
+        .tile-64 { background: #ea580c; color: #fff; }
+        .tile-128 { background: #c2410c; color: #fff; font-size: 1.5rem; }
+        .tile-256 { background: #9a3412; color: #fff; font-size: 1.5rem; box-shadow: 0 0 10px #f97316; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; }
+            main { margin-left: 0; padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>NAVIGATION</h2>
+        <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../games.html" style="color: var(--accent);">Arcade</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="game-header">
+            <h1 style="font-size: 3rem; color: var(--accent);">2048</h1>
+            <div class="score-container">
+                <span class="score-label">SCORE</span>
+                <span class="score-value" id="score">0</span>
+            </div>
+        </div>
+        <div id="grid"></div>
+        <p style="margin-top: 20px; color: #9a3412;">Use <b>Arrow Keys</b> or <b>WASD</b> to merge tiles</p>
+    </main>
+
+    <script>
+        const gridDisplay = document.getElementById('grid');
+        const scoreDisplay = document.getElementById('score');
+        let score = 0;
+        let tiles = [];
+
+        function createBoard() {
+            for (let i = 0; i < 16; i++) {
+                let tile = document.createElement('div');
+                tile.classList.add('tile');
+                tile.innerHTML = '';
+                gridDisplay.appendChild(tile);
+                tiles.push(tile);
+            }
+            generate();
+            generate();
+        }
+
+        function generate() {
+            let randomNumber = Math.floor(Math.random() * tiles.length);
+            if (tiles[randomNumber].innerHTML === "") {
+                tiles[randomNumber].innerHTML = 2;
+                updateStyles();
+                checkForGameOver();
+            } else generate();
+        }
+
+        function updateStyles() {
+            tiles.forEach(tile => {
+                tile.className = 'tile'; 
+                if (tile.innerHTML) {
+                    tile.classList.add('tile-' + tile.innerHTML);
+                }
+            });
+        }
+
+        // Sliding Logic
+        function moveRight() {
+            for (let i = 0; i < 16; i++) {
+                if (i % 4 === 0) {
+                    let totalOne = tiles[i].innerHTML;
+                    let totalTwo = tiles[i+1].innerHTML;
+                    let totalThree = tiles[i+2].innerHTML;
+                    let totalFour = tiles[i+3].innerHTML;
+                    let row = [parseInt(totalOne) || 0, parseInt(totalTwo) || 0, parseInt(totalThree) || 0, parseInt(totalFour) || 0];
+                    
+                    let filteredRow = row.filter(num => num);
+                    let missing = 4 - filteredRow.length;
+                    let zeros = Array(missing).fill(0);
+                    let newRow = zeros.concat(filteredRow);
+
+                    tiles[i].innerHTML = newRow[0] || '';
+                    tiles[i+1].innerHTML = newRow[1] || '';
+                    tiles[i+2].innerHTML = newRow[2] || '';
+                    tiles[i+3].innerHTML = newRow[3] || '';
+                }
+            }
+        }
+
+        function moveLeft() {
+            for (let i = 0; i < 16; i++) {
+                if (i % 4 === 0) {
+                    let totalOne = tiles[i].innerHTML;
+                    let totalTwo = tiles[i+1].innerHTML;
+                    let totalThree = tiles[i+2].innerHTML;
+                    let totalFour = tiles[i+3].innerHTML;
+                    let row = [parseInt(totalOne) || 0, parseInt(totalTwo) || 0, parseInt(totalThree) || 0, parseInt(totalFour) || 0];
+
+                    let filteredRow = row.filter(num => num);
+                    let missing = 4 - filteredRow.length;
+                    let zeros = Array(missing).fill(0);
+                    let newRow = filteredRow.concat(zeros);
+
+                    tiles[i].innerHTML = newRow[0] || '';
+                    tiles[i+1].innerHTML = newRow[1] || '';
+                    tiles[i+2].innerHTML = newRow[2] || '';
+                    tiles[i+3].innerHTML = newRow[3] || '';
+                }
+            }
+        }
+
+        function combineRow() {
+            for (let i = 0; i < 15; i++) {
+                if (tiles[i].innerHTML === tiles[i+1].innerHTML && tiles[i].innerHTML !== '' && (i+1)%4 !== 0) {
+                    let combinedTotal = parseInt(tiles[i].innerHTML) + parseInt(tiles[i+1].innerHTML);
+                    tiles[i].innerHTML = combinedTotal;
+                    tiles[i+1].innerHTML = '';
+                    score += combinedTotal;
+                    scoreDisplay.innerHTML = score;
+                }
+            }
+        }
+
+        // Logic for Up/Down is similar using columns
+        function moveDown() {
+            for (let i = 0; i < 4; i++) {
+                let totalOne = tiles[i].innerHTML;
+                let totalTwo = tiles[i+4].innerHTML;
+                let totalThree = tiles[i+8].innerHTML;
+                let totalFour = tiles[i+12].innerHTML;
+                let column = [parseInt(totalOne) || 0, parseInt(totalTwo) || 0, parseInt(totalThree) || 0, parseInt(totalFour) || 0];
+
+                let filteredColumn = column.filter(num => num);
+                let missing = 4 - filteredColumn.length;
+                let zeros = Array(missing).fill(0);
+                let newColumn = zeros.concat(filteredColumn);
+
+                tiles[i].innerHTML = newColumn[0] || '';
+                tiles[i+4].innerHTML = newColumn[1] || '';
+                tiles[i+8].innerHTML = newColumn[2] || '';
+                tiles[i+12].innerHTML = newColumn[3] || '';
+            }
+        }
+
+        function moveUp() {
+            for (let i = 0; i < 4; i++) {
+                let totalOne = tiles[i].innerHTML;
+                let totalTwo = tiles[i+4].innerHTML;
+                let totalThree = tiles[i+8].innerHTML;
+                let totalFour = tiles[i+12].innerHTML;
+                let column = [parseInt(totalOne) || 0, parseInt(totalTwo) || 0, parseInt(totalThree) || 0, parseInt(totalFour) || 0];
+
+                let filteredColumn
