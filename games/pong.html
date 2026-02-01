@@ -7,108 +7,122 @@
     <style>
         :root { --sidebar-width: 260px; --accent: #6366f1; --bg: #f8fafc; --text: #1e293b; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
         
-        /* Sidebar Navigation */
-        nav { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid #e2e8f0; padding: 2.5rem; position: fixed; height: 100vh; }
-        nav h2 { font-size: 0.85rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 2rem; }
-        nav ul { list-style: none; }
-        nav li { margin-bottom: 1.2rem; }
+        /* Sidebar */
+        nav { width: var(--sidebar-width); background: #fff; border-right: 1px solid #e2e8f0; padding: 2rem; position: fixed; height: 100vh; }
+        nav ul { list-style: none; margin-top: 2rem; }
+        nav li { margin-bottom: 1rem; }
         nav a { text-decoration: none; color: #64748b; font-weight: 600; }
 
         /* Main Content */
-        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 3rem; display: flex; flex-direction: column; align-items: center; }
-        canvas { background: #000; border: 4px solid var(--accent); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .score { font-size: 2.5rem; font-weight: bold; color: var(--accent); margin-bottom: 10px; font-family: monospace; }
-        
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        canvas { background: #000; border: 4px solid var(--accent); border-radius: 12px; display: block; }
+        .score { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; font-family: monospace; }
+
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            nav { width: 100%; height: auto; position: relative; padding: 1.5rem; border-bottom: 1px solid #e2e8f0; }
-            nav ul { display: flex; flex-wrap: wrap; gap: 15px; }
-            main { margin-left: 0; padding: 1.5rem; }
+            nav { width: 100%; height: auto; position: relative; padding: 1rem; }
+            main { margin-left: 0; }
         }
     </style>
 </head>
 <body>
     <nav>
-        <h2>Navigation</h2>
+        <div style="font-weight: bold; color: #94a3b8; font-size: 0.8rem;">NAVIGATION</div>
         <ul>
             <li><a href="../index.html">Home</a></li>
             <li><a href="../games.html" style="color: var(--accent);">Arcade</a></li>
-            <li><a href="../media.html">Media</a></li>
-            <li><a href="../guestbook.html">Guestbook</a></li>
         </ul>
     </nav>
 
     <main>
-        <div class="score"><span id="pScore">0</span> : <span id="cScore">0</span></div>
-        <canvas id="pong" width="600" height="400"></canvas>
-        <p style="margin-top:15px; color:#64748b;">Hold <b>W / S</b> or <b>Up / Down</b> to move</p>
-        <a href="../games.html" style="margin-top:20px; color:var(--accent); text-decoration:none; font-weight:bold;">← Back to Arcade</a>
+        <div class="score"><span id="pS">0</span> : <span id="cS">0</span></div>
+        <canvas id="pongCanvas"></canvas>
+        <p style="margin-top: 10px; color: #64748b;">W/S or Arrows to move</p>
     </main>
 
     <script>
-        const canvas = document.getElementById("pong");
-        const ctx = canvas.getContext("2d");
+        // Use a self-executing function to avoid conflicts
+        (function() {
+            const canvas = document.getElementById("pongCanvas");
+            const ctx = canvas.getContext("2d");
 
-        let pScore = 0, cScore = 0;
-        const paddleWidth = 12, paddleHeight = 80;
-        
-        let user = { x: 10, y: canvas.height/2 - paddleHeight/2, dy: 0 };
-        let com = { x: canvas.width - 10 - paddleWidth, y: canvas.height/2 - paddleHeight/2 };
-        let ball = { x: canvas.width/2, y: canvas.height/2, r: 7, speed: 6, dx: 6, dy: 6 };
+            // Set fixed dimensions
+            canvas.width = 600;
+            canvas.height = 400;
 
-        // Key Listeners
-        document.addEventListener("keydown", e => {
-            if(e.key == "ArrowUp" || e.key == "w") user.dy = -8;
-            if(e.key == "ArrowDown" || e.key == "s") user.dy = 8;
-        });
+            let pScore = 0, cScore = 0;
+            const pW = 12, pH = 80;
+            
+            let user = { x: 10, y: 160, dy: 0 };
+            let com = { x: 578, y: 160 };
+            let ball = { x: 300, y: 200, r: 7, spd: 5, dx: 5, dy: 5 };
 
-        document.addEventListener("keyup", e => {
-            if(e.key == "ArrowUp" || e.key == "w" || e.key == "ArrowDown" || e.key == "s") user.dy = 0;
-        });
+            document.addEventListener("keydown", e => {
+                if(e.key == "ArrowUp" || e.key == "w") user.dy = -7;
+                if(e.key == "ArrowDown" || e.key == "s") user.dy = 7;
+            });
 
-        function resetBall() {
-            ball.x = canvas.width/2;
-            ball.y = canvas.height/2;
-            ball.speed = 6;
-            ball.dx = -ball.dx;
-        }
+            document.addEventListener("keyup", e => {
+                if(e.key == "ArrowUp" || e.key == "w" || e.key == "ArrowDown" || e.key == "s") user.dy = 0;
+            });
 
-        function drawNet() {
-            ctx.setLineDash([10, 10]);
-            ctx.beginPath();
-            ctx.moveTo(canvas.width/2, 0);
-            ctx.lineTo(canvas.width/2, canvas.height);
-            ctx.strokeStyle = "#ffffff44";
-            ctx.stroke();
-            ctx.setLineDash([]);
-        }
-
-        function update() {
-            // Move Player
-            user.y += user.dy;
-            if(user.y < 0) user.y = 0;
-            if(user.y > canvas.height - paddleHeight) user.y = canvas.height - paddleHeight;
-
-            // Move Ball
-            ball.x += ball.dx; 
-            ball.y += ball.dy;
-
-            // AI Logic - "Beatable Mode"
-            let comLevel = 0.05; // Very beatable speed
-            if(ball.x > canvas.width / 2) {
-                com.y += (ball.y - (com.y + paddleHeight/2)) * comLevel;
+            function reset() {
+                ball.x = 300; ball.y = 200;
+                ball.spd = 5; ball.dx = -ball.dx;
             }
 
-            // Top/Bottom Wall bounce
-            if(ball.y + ball.r > canvas.height || ball.y - ball.r < 0) ball.dy = -ball.dy;
+            function update() {
+                user.y += user.dy;
+                if(user.y < 0) user.y = 0;
+                if(user.y > 400 - pH) user.y = 400 - pH;
 
-            // Paddle collision
-            let player = (ball.x < canvas.width/2) ? user : com;
-            if(ball.x + ball.r > player.x && ball.x - ball.r < player.x + paddleWidth && 
-               ball.y > player.y && ball.y < player.y + paddleHeight) {
-                
-                let collidePoint = (ball.y - (player.y + paddleHeight/2)) / (paddleHeight/2);
-                let angleRad = (Math.PI/4) * collidePoint;
-                let direction = (ball.x
+                ball.x += ball.dx; ball.y += ball.dy;
+
+                // Simple AI
+                if(ball.x > 300) {
+                    com.y += (ball.y - (com.y + pH/2)) * 0.07;
+                }
+
+                if(ball.y + ball.r > 400 || ball.y - ball.r < 0) ball.dy = -ball.dy;
+
+                let player = (ball.x < 300) ? user : com;
+                if(ball.x + ball.r > player.x && ball.x - ball.r < player.x + pW && ball.y > player.y && ball.y < player.y + pH) {
+                    let collidePoint = (ball.y - (player.y + pH/2)) / (pH/2);
+                    let angle = (Math.PI/4) * collidePoint;
+                    let dir = (ball.x < 300) ? 1 : -1;
+                    ball.dx = dir * ball.spd * Math.cos(angle);
+                    ball.dy = ball.spd * Math.sin(angle);
+                    ball.spd += 0.2;
+                }
+
+                if(ball.x < 0) { cScore++; document.getElementById("cS").innerText = cScore; reset(); }
+                if(ball.x > 600) { pScore++; document.getElementById("pS").innerText = pScore; reset(); }
+            }
+
+            function draw() {
+                ctx.fillStyle = "#000";
+                ctx.fillRect(0, 0, 600, 400);
+
+                // Paddles
+                ctx.fillStyle = "#6366f1";
+                ctx.fillRect(user.x, user.y, pW, pH);
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(com.x, com.y, pW, pH);
+
+                // Ball
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+                ctx.fill();
+
+                update();
+                requestAnimationFrame(draw);
+            }
+
+            console.log("Pong initialized");
+            draw();
+        })();
+    </script>
+</body>
+</html>
