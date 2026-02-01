@@ -93,7 +93,7 @@
             ball.x += ball.dx; ball.y += ball.dy;
 
             // AI Logic (Right Paddle)
-            let comLevel = 0.12; 
+            let comLevel = 0.06; 
             com.y += (ball.y - (com.y + paddleHeight/2)) * comLevel;
 
             // Wall bounce (Top & Bottom)
