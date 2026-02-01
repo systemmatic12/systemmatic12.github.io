@@ -196,4 +196,55 @@
                 let totalFour = tiles[i+12].innerHTML;
                 let column = [parseInt(totalOne) || 0, parseInt(totalTwo) || 0, parseInt(totalThree) || 0, parseInt(totalFour) || 0];
 
-                let filteredColumn
+                let filteredColumn = column.filter(num => num);
+                let missing = 4 - filteredColumn.length;
+                let zeros = Array(missing).fill(0);
+                let newColumn = filteredColumn.concat(zeros);
+
+                tiles[i].innerHTML = newColumn[0] || '';
+                tiles[i+4].innerHTML = newColumn[1] || '';
+                tiles[i+8].innerHTML = newColumn[2] || '';
+                tiles[i+12].innerHTML = newColumn[3] || '';
+            }
+        }
+
+        function combineColumn() {
+            for (let i = 0; i < 12; i++) {
+                if (tiles[i].innerHTML === tiles[i+4].innerHTML && tiles[i].innerHTML !== '') {
+                    let combinedTotal = parseInt(tiles[i].innerHTML) + parseInt(tiles[i+4].innerHTML);
+                    tiles[i].innerHTML = combinedTotal;
+                    tiles[i+4].innerHTML = '';
+                    score += combinedTotal;
+                    scoreDisplay.innerHTML = score;
+                }
+            }
+        }
+
+        function control(e) {
+            if (e.keyCode === 39 || e.key === 'd') { keyRight(); }
+            else if (e.keyCode === 37 || e.key === 'a') { keyLeft(); }
+            else if (e.keyCode === 38 || e.key === 'w') { keyUp(); }
+            else if (e.keyCode === 40 || e.key === 's') { keyDown(); }
+        }
+
+        function keyRight() { moveRight(); combineRow(); moveRight(); generate(); }
+        function keyLeft() { moveLeft(); combineRow(); moveLeft(); generate(); }
+        function keyDown() { moveDown(); combineColumn(); moveDown(); generate(); }
+        function keyUp() { moveUp(); combineColumn(); moveUp(); generate(); }
+
+        document.addEventListener('keyup', control);
+        createBoard();
+
+        function checkForGameOver() {
+            let zeros = 0;
+            for (let i = 0; i < tiles.length; i++) {
+                if (tiles[i].innerHTML == "") zeros++;
+            }
+            if (zeros === 0) {
+                alert('No more moves! Game Over.');
+                document.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
