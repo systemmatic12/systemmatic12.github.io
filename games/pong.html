@@ -58,7 +58,7 @@
         let com = { x: canvas.width - 10 - paddleWidth, y: canvas.height/2 - paddleHeight/2 };
         let ball = { x: canvas.width/2, y: canvas.height/2, r: 7, speed: 6, dx: 6, dy: 6 };
 
-        // SMOOTH MOVEMENT LISTENERS
+        // Key Listeners
         document.addEventListener("keydown", e => {
             if(e.key == "ArrowUp" || e.key == "w") user.dy = -8;
             if(e.key == "ArrowDown" || e.key == "s") user.dy = 8;
@@ -69,8 +69,10 @@
         });
 
         function resetBall() {
-            ball.x = canvas.width/2; ball.y = canvas.height/2;
-            ball.speed = 6; ball.dx = -ball.dx;
+            ball.x = canvas.width/2;
+            ball.y = canvas.height/2;
+            ball.speed = 6;
+            ball.dx = -ball.dx;
         }
 
         function drawNet() {
@@ -80,53 +82,26 @@
             ctx.lineTo(canvas.width/2, canvas.height);
             ctx.strokeStyle = "#ffffff44";
             ctx.stroke();
-            ctx.setLineDash([]); // Reset dash
+            ctx.setLineDash([]);
         }
 
-function update() {
-            // 1. Move Player Paddle
+        function update() {
+            // Move Player
             user.y += user.dy;
             if(user.y < 0) user.y = 0;
             if(user.y > canvas.height - paddleHeight) user.y = canvas.height - paddleHeight;
 
-            // 2. Move Ball
-            ball.x += ball.dx; ball.y += ball.dy;
+            // Move Ball
+            ball.x += ball.dx; 
+            ball.y += ball.dy;
 
-            // 3. AI Logic (The Fix is here!)
-            let comLevel = 0.06; // We define the "Difficulty" here
-            
-            // AI only reacts when the ball is on its side (passed the halfway point)
+            // AI Logic - "Beatable Mode"
+            let comLevel = 0.05; // Very beatable speed
             if(ball.x > canvas.width / 2) {
                 com.y += (ball.y - (com.y + paddleHeight/2)) * comLevel;
             }
 
-            // 4. Wall bounce (Top & Bottom)
-            if(ball.y + ball.r > canvas.height || ball.y - ball.r < 0) ball.dy = -ball.dy;
-
-            // 5. Paddle collision logic
-            let player = (ball.x < canvas.width/2) ? user : com;
-            if(ball.x + ball.r > player.x && ball.x - ball.r < player.x + paddleWidth && 
-               ball.y > player.y && ball.y < player.y + paddleHeight) {
-                
-                let collidePoint = (ball.y - (player.y + paddleHeight/2)) / (paddleHeight/2);
-                let angleRad = (Math.PI/4) * collidePoint;
-                let direction = (ball.x < canvas.width/2) ? 1 : -1;
-                
-                ball.dx = direction * ball.speed * Math.cos(angleRad);
-                ball.dy = ball.speed * Math.sin(angleRad);
-                ball.speed += 0.3; 
-            }
-
-            // 6. Scoring
-            if(ball.x - ball.r < 0) { cScore++; document.getElementById("cScore").innerText = cScore; resetBall(); }
-            if(ball.x + ball.r > canvas.width) { pScore++; document.getElementById("pScore").innerText = pScore; resetBall(); }
-        }
-
-            // AI Logic (Right Paddle)
-            let comLevel = 0.06; 
-            com.y += (ball.y - (com.y + paddleHeight/2)) * comLevel;
-
-            // Wall bounce (Top & Bottom)
+            // Top/Bottom Wall bounce
             if(ball.y + ball.r > canvas.height || ball.y - ball.r < 0) ball.dy = -ball.dy;
 
             // Paddle collision
@@ -134,36 +109,6 @@ function update() {
             if(ball.x + ball.r > player.x && ball.x - ball.r < player.x + paddleWidth && 
                ball.y > player.y && ball.y < player.y + paddleHeight) {
                 
-                // Calculate where it hit the paddle to change angle
                 let collidePoint = (ball.y - (player.y + paddleHeight/2)) / (paddleHeight/2);
                 let angleRad = (Math.PI/4) * collidePoint;
-                let direction = (ball.x < canvas.width/2) ? 1 : -1;
-                
-                ball.dx = direction * ball.speed * Math.cos(angleRad);
-                ball.dy = ball.speed * Math.sin(angleRad);
-                ball.speed += 0.3; // Get faster!
-            }
-
-            // Scoring
-            if(ball.x - ball.r < 0) { cScore++; document.getElementById("cScore").innerText = cScore; resetBall(); }
-            if(ball.x + ball.r > canvas.width) { pScore++; document.getElementById("pScore").innerText = pScore; resetBall(); }
-        }
-
-        function draw() {
-            ctx.fillStyle = "#000"; ctx.fillRect(0,0,canvas.width,canvas.height);
-            drawNet();
-            
-            // Player Paddle
-            ctx.fillStyle = "#6366f1"; ctx.fillRect(user.x, user.y, paddleWidth, paddleHeight);
-            // AI Paddle
-            ctx.fillStyle = "#fff"; ctx.fillRect(com.x, com.y, paddleWidth, paddleHeight);
-            // Ball
-            ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
-            
-            update(); 
-            requestAnimationFrame(draw);
-        }
-        draw();
-    </script>
-</body>
-</html>
+                let direction = (ball.x
