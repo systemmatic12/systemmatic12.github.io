@@ -11,25 +11,27 @@
         
         /* Sidebar */
         nav { width: var(--sidebar-width); background: #fff; border-right: 1px solid #e2e8f0; padding: 2rem; position: fixed; height: 100vh; }
-        nav ul { list-style: none; margin-top: 2rem; }
+        nav h2 { font-size: 0.8rem; color: #94a3b8; letter-spacing: 1px; margin-bottom: 2rem; }
+        nav ul { list-style: none; }
         nav li { margin-bottom: 1rem; }
         nav a { text-decoration: none; color: #64748b; font-weight: 600; }
 
         /* Main Content */
         main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        canvas { background: #000; border: 4px solid var(--accent); border-radius: 12px; display: block; }
-        .score { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; font-family: monospace; }
+        canvas { background: #000; border: 4px solid var(--accent); border-radius: 12px; display: block; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .score { font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem; font-family: 'Courier New', monospace; color: var(--accent); }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            nav { width: 100%; height: auto; position: relative; padding: 1rem; }
-            main { margin-left: 0; }
+            nav { width: 100%; height: auto; position: relative; padding: 1rem; border-right: none; border-bottom: 1px solid #eee; }
+            nav ul { display: flex; gap: 15px; }
+            main { margin-left: 0; padding: 1rem; }
         }
     </style>
 </head>
 <body>
     <nav>
-        <div style="font-weight: bold; color: #94a3b8; font-size: 0.8rem;">NAVIGATION</div>
+        <h2>NAVIGATION</h2>
         <ul>
             <li><a href="../index.html">Home</a></li>
             <li><a href="../games.html" style="color: var(--accent);">Arcade</a></li>
@@ -39,29 +41,33 @@
     <main>
         <div class="score"><span id="pS">0</span> : <span id="cS">0</span></div>
         <canvas id="pongCanvas"></canvas>
-        <p style="margin-top: 10px; color: #64748b;">W/S or Arrows to move</p>
+        <p style="margin-top: 15px; color: #64748b; font-weight: 500;">Use <b>W / S</b> or <b>Arrow Keys</b></p>
+        <a href="../games.html" style="margin-top:20px; color:var(--accent); text-decoration:none; font-weight:bold;">← Back to Arcade</a>
     </main>
 
     <script>
-        // Use a self-executing function to avoid conflicts
         (function() {
             const canvas = document.getElementById("pongCanvas");
             const ctx = canvas.getContext("2d");
 
-            // Set fixed dimensions
             canvas.width = 600;
             canvas.height = 400;
 
             let pScore = 0, cScore = 0;
             const pW = 12, pH = 80;
             
+            // Speed Settings
+            const playerSpeed = 8;
+            const aiMaxSpeed = 7.5; // AI is slightly slower than you now!
+
             let user = { x: 10, y: 160, dy: 0 };
-            let com = { x: 578, y: 160 };
+            let com = { x: 578, y: 160, dy: 0 };
             let ball = { x: 300, y: 200, r: 7, spd: 5, dx: 5, dy: 5 };
 
+            // Input Handling
             document.addEventListener("keydown", e => {
-                if(e.key == "ArrowUp" || e.key == "w") user.dy = -7;
-                if(e.key == "ArrowDown" || e.key == "s") user.dy = 7;
+                if(e.key == "ArrowUp" || e.key == "w") user.dy = -playerSpeed;
+                if(e.key == "ArrowDown" || e.key == "s") user.dy = playerSpeed;
             });
 
             document.addEventListener("keyup", e => {
@@ -70,57 +76,87 @@
 
             function reset() {
                 ball.x = 300; ball.y = 200;
-                ball.spd = 5; ball.dx = -ball.dx;
+                ball.spd = 5; 
+                ball.dx = (Math.random() > 0.5 ? 1 : -1) * 5;
+                ball.dy = (Math.random() - 0.5) * 6;
             }
 
             function update() {
+                // 1. Move Player
                 user.y += user.dy;
                 if(user.y < 0) user.y = 0;
-                if(user.y > 400 - pH) user.y = 400 - pH;
+                if(user.y > canvas.height - pH) user.y = canvas.height - pH;
 
-                ball.x += ball.dx; ball.y += ball.dy;
+                // 2. Move Ball
+                ball.x += ball.dx; 
+                ball.y += ball.dy;
 
-                // Simple AI
-                if(ball.x > 300) {
-                    com.y += (ball.y - (com.y + pH/2)) * 0.07;
+                // 3. FAIR AI Logic (Constant Speed, No Teleporting)
+                let paddleCenter = com.y + pH / 2;
+                if (ball.x > canvas.width / 2) { // AI starts moving when ball crosses middle
+                    if (paddleCenter < ball.y - 10) {
+                        com.y += aiMaxSpeed;
+                    } else if (paddleCenter > ball.y + 10) {
+                        com.y -= aiMaxSpeed;
+                    }
                 }
+                // Keep AI in bounds
+                if(com.y < 0) com.y = 0;
+                if(com.y > canvas.height - pH) com.y = canvas.height - pH;
 
-                if(ball.y + ball.r > 400 || ball.y - ball.r < 0) ball.dy = -ball.dy;
+                // 4. Wall Bounce
+                if(ball.y + ball.r > canvas.height || ball.y - ball.r < 0) ball.dy = -ball.dy;
 
-                let player = (ball.x < 300) ? user : com;
-                if(ball.x + ball.r > player.x && ball.x - ball.r < player.x + pW && ball.y > player.y && ball.y < player.y + pH) {
+                // 5. Paddle Collisions
+                let player = (ball.x < canvas.width/2) ? user : com;
+                if(ball.x + ball.r > player.x && ball.x - ball.r < player.x + pW && 
+                   ball.y > player.y && ball.y < player.y + pH) {
+                    
+                    // Angle math based on where it hits the paddle
                     let collidePoint = (ball.y - (player.y + pH/2)) / (pH/2);
                     let angle = (Math.PI/4) * collidePoint;
-                    let dir = (ball.x < 300) ? 1 : -1;
+                    let dir = (ball.x < canvas.width/2) ? 1 : -1;
+                    
                     ball.dx = dir * ball.spd * Math.cos(angle);
                     ball.dy = ball.spd * Math.sin(angle);
-                    ball.spd += 0.2;
+                    ball.spd += 0.3; // Speed up over time
                 }
 
+                // 6. Scoring
                 if(ball.x < 0) { cScore++; document.getElementById("cS").innerText = cScore; reset(); }
-                if(ball.x > 600) { pScore++; document.getElementById("pS").innerText = pScore; reset(); }
+                if(ball.x > canvas.width) { pScore++; document.getElementById("pS").innerText = pScore; reset(); }
             }
 
             function draw() {
                 ctx.fillStyle = "#000";
-                ctx.fillRect(0, 0, 600, 400);
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Center Line
+                ctx.setLineDash([10, 10]);
+                ctx.strokeStyle = "#ffffff33";
+                ctx.beginPath();
+                ctx.moveTo(canvas.width/2, 0);
+                ctx.lineTo(canvas.width/2, canvas.height);
+                ctx.stroke();
 
                 // Paddles
-                ctx.fillStyle = "#6366f1";
+                ctx.setLineDash([]); // Reset dash for paddles
+                ctx.fillStyle = "#6366f1"; // User Paddle (Indigo)
                 ctx.fillRect(user.x, user.y, pW, pH);
-                ctx.fillStyle = "#fff";
+                
+                ctx.fillStyle = "#fff"; // AI Paddle
                 ctx.fillRect(com.x, com.y, pW, pH);
 
                 // Ball
                 ctx.beginPath();
                 ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+                ctx.fillStyle = "#fff";
                 ctx.fill();
 
                 update();
                 requestAnimationFrame(draw);
             }
 
-            console.log("Pong initialized");
             draw();
         })();
     </script>
