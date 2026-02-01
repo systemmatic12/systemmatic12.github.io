@@ -1,1 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong AI | Neron's Hub</title>
+    <style>
+        :root { --sidebar-width: 260px; --accent: #6366f1; --bg: #f8fafc; --text: #1e293b; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+        nav { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid #e2e8f0; padding: 2.5rem; position: fixed; height: 100vh; }
+        nav h2 { font-size: 0.85rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 2rem; }
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1.2rem; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; }
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 3rem; display: flex; flex-direction: column; align-items: center; }
+        canvas { background: #000; border: 4px solid var(--accent); border-radius: 12px; }
+        .score { font-size: 2rem; font-weight: bold; color: var(--accent); margin-bottom: 10px; }
+        @media (max-width: 768px) { body { flex-direction: column; } nav { width: 100%; height: auto; position: relative; } main { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <nav><h2>Navigation</h2><ul><li><a href="../index.html">Home</a></li><li><a href="../games.html" style="color: var(--accent);">Arcade</a></li></ul></nav>
+    <main>
+        <div class="score"><span id="pScore">0</span> - <span id="cScore">0</span></div>
+        <canvas id="pong" width="600" height="400"></canvas>
+        <p style="margin-top:15px; color:#64748b;">Use W/S or Arrow Up/Down</p>
+        <a href="../games.html" style="margin-top:20px; color:var(--accent); text-decoration:none; font-weight:bold;">← Back</a>
+    </main>
+    <script>
+        const canvas = document.getElementById("pong");
+        const ctx = canvas.getContext("2d");
+        let pScore = 0, cScore = 0;
+        const paddleWidth = 10, paddleHeight = 80;
+        let user = { x: 0, y: canvas.height/2 - paddleHeight/2, color: "#6366f1" };
+        let com = { x: canvas.width - paddleWidth, y: canvas.height/2 - paddleHeight/2, color: "#fff" };
+        let ball = { x: canvas.width/2, y: canvas.height/2, r: 8, speed: 5, dx: 5, dy: 5 };
 
+        document.addEventListener("keydown", e => {
+            if(e.key == "ArrowUp" || e.key == "w") user.y -= 25;
+            if(e.key == "ArrowDown" || e.key == "s") user.y += 25;
+        });
+
+        function resetBall() {
+            ball.x = canvas.width/2; ball.y = canvas.height/2;
+            ball.speed = 5; ball.dx = -ball.dx;
+        }
+
+        function update() {
+            ball.x += ball.dx; ball.y += ball.dy;
+            // AI Logic
+            com.y += (ball.y - (com.y + paddleHeight/2)) * 0.1;
+            // Wall bounce
+            if(ball.y + ball.r > canvas.height || ball.y - ball.r < 0) ball.dy = -ball.dy;
+            // Paddle collision
+            let player = (ball.x < canvas.width/2) ? user : com;
+            if(ball.x + ball.r > player.x && ball.x - ball.r < player.x + paddleWidth && ball.y > player.y && ball.y < player.y + paddleHeight) {
+                ball.dx = -ball.dx; ball.speed += 0.2;
+            }
+            // Score
+            if(ball.x - ball.r < 0) { cScore++; document.getElementById("cScore").innerText = cScore; resetBall(); }
+            if(ball.x + ball.r > canvas.width) { pScore++; document.getElementById("pScore").innerText = pScore; resetBall(); }
+        }
+
+        function draw() {
+            ctx.fillStyle = "#000"; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = user.color; ctx.fillRect(user.x, user.y, paddleWidth, paddleHeight);
+            ctx.fillStyle = com.color; ctx.fillRect(com.x, com.y, paddleWidth, paddleHeight);
+            ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
+            update(); requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
