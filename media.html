@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Gallery | Neron's Hub</title>
+    <style>
+        :root { 
+            --sidebar-width: 260px; 
+            --accent: #6366f1; 
+            --bg: #f8fafc; 
+            --text: #1e293b; 
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        /* Sidebar Navigation */
+        nav { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid #e2e8f0; padding: 2.5rem; position: fixed; height: 100vh; }
+        nav h2 { font-size: 0.85rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 2rem; }
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1.2rem; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
+        nav a:hover { color: var(--accent); }
+
+        /* Main Content */
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 3rem; }
+        h1 { font-size: 2.5rem; color: #0f172a; margin-bottom: 2rem; }
+
+        /* --- MEDIA GRID --- */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .media-item {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: 0.3s ease;
+        }
+
+        .media-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .media-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover; /* Keeps images from looking stretched */
+            display: block;
+        }
+
+        .media-info { padding: 1rem; }
+        .media-info h3 { font-size: 1.1rem; margin-bottom: 0.3rem; color: #0f172a; }
+        .media-info p { font-size: 0.9rem; color: #64748b; }
+
+        /* Mobile Fix */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0; }
+            nav ul { display: flex; flex-wrap: wrap; gap: 15px; }
+            main { margin-left: 0; padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="games.html">Games</a></li>
+            <li><a href="media.html" style="color: var(--accent);">Media</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="guestbook.html">Guestbook</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h1>Media Gallery</h1>
+
+        <div class="media-grid">
+            <div class="media-item">
+                <img src="YOUR_IMAGE_URL_HERE" alt="Project Screenshot">
+                <div class="media-info">
+                    <h3>My Pong AI</h3>
+                    <p>A screenshot of the neural network in action.</p>
+                </div>
+            </div>
+
+            <div class="media-item">
+                <img src="YOUR_IMAGE_URL_HERE" alt="Gaming Setup">
+                <div class="media-info">
+                    <h3>The Setup</h3>
+                    <p>Where all the coding and gaming happens.</p>
+                </div>
+            </div>
+
+            </div>
+    </main>
+
+</body>
+</html>
