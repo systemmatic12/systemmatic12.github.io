@@ -91,6 +91,9 @@
 
             // Move Ball
             ball.x += ball.dx; ball.y += ball.dy;
+            if(ball.x > canvas.width / 2) {
+    com.y += (ball.y - (com.y + paddleHeight/2)) * comLevel;
+}
 
             // AI Logic (Right Paddle)
             let comLevel = 0.06; 
