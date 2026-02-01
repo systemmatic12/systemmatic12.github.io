@@ -5,39 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flappy Bird | Neron's Hub</title>
     <style>
-        :root { --sidebar-width: 260px; --accent: #f472b6; --bg: #020617; }
+        :root { --sidebar-width: 260px; --accent: #f472b6; --bg: #f8fafc; --text: #1e293b; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; display: flex; min-height: 100vh; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow: hidden; }
         
-        /* Sidebar */
-        nav { width: var(--sidebar-width); background: #020617; border-right: 1px solid #1e293b; padding: 2.5rem; position: fixed; height: 100vh; }
-        nav h2 { font-size: 0.8rem; color: #64748b; letter-spacing: 1px; margin-bottom: 2rem; }
+        /* White Sidebar - Matching your site */
+        nav { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid #e2e8f0; padding: 2.5rem; position: fixed; height: 100vh; }
+        nav h2 { font-size: 0.8rem; color: #94a3b8; letter-spacing: 1px; margin-bottom: 2rem; text-transform: uppercase; }
         nav ul { list-style: none; }
         nav li { margin-bottom: 1.2rem; }
-        nav a { text-decoration: none; color: #94a3b8; font-weight: 600; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
+        nav a:hover { color: var(--accent); }
 
         /* Game Content */
         main { margin-left: var(--sidebar-width); flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        canvas { background: #020617; border: 3px solid var(--accent); border-radius: 12px; cursor: pointer; box-shadow: 0 0 25px rgba(244, 114, 182, 0.2); }
+        canvas { background: #020617; border: 4px solid var(--accent); border-radius: 12px; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .score { font-size: 3rem; color: var(--accent); font-family: 'Courier New', monospace; margin-bottom: 10px; font-weight: bold; }
         
-        @media (max-width: 768px) { body { flex-direction: column; } nav { width: 100%; height: auto; position: relative; } main { margin-left: 0; } }
+        @media (max-width: 768px) { 
+            body { flex-direction: column; } 
+            nav { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid #e2e8f0; padding: 1.5rem; } 
+            main { margin-left: 0; padding: 1rem; } 
+        }
     </style>
 </head>
 <body>
     <nav>
-        <h2>NAVIGATION</h2>
+        <h2>Navigation</h2>
         <ul>
             <li><a href="../index.html">Home</a></li>
             <li><a href="../games.html" style="color: var(--accent);">Arcade</a></li>
+            <li><a href="../media.html">Media</a></li>
+            <li><a href="../guestbook.html">Guestbook</a></li>
         </ul>
     </nav>
 
     <main>
         <div class="score" id="scoreVal">0</div>
         <canvas id="flappyCanvas" width="400" height="500"></canvas>
-        <p style="margin-top: 15px; color: #64748b; font-weight: bold;">[ SPACE ] or [ CLICK ] TO JUMP</p>
-        <a href="../games.html" style="margin-top:20px; color:var(--accent); text-decoration:none; font-weight:bold;">← Back to Arcade</a>
+        <p style="margin-top: 15px; color: #64748b; font-weight: 500;">[ SPACE ] or [ CLICK ] TO JUMP</p>
+        <a href="../games.html" style="margin-top:20px; color:var(--accent); text-decoration:none; font-weight:bold; font-size: 0.9rem;">← BACK TO ARCADE</a>
     </main>
 
     <script>
@@ -51,10 +58,10 @@
         let gameActive = true;
 
         function createPipe() {
-            let gap = 130;
+            let gap = 140;
             let minHeight = 50;
             let height = Math.floor(Math.random() * (canvas.height - gap - minHeight * 2)) + minHeight;
-            pipes.push({ x: canvas.width, top: height, bottom: canvas.height - height - gap, w: 60 });
+            pipes.push({ x: canvas.width, top: height, bottom: canvas.height - height - gap, w: 65 });
         }
 
         function reset() {
@@ -75,18 +82,14 @@
                 setTimeout(reset, 800);
             }
 
-            if (frame % 100 === 0) createPipe();
+            if (frame % 90 === 0) createPipe();
 
             pipes.forEach((p, i) => {
-                p.x -= 2.5;
-
-                // Collision
-                if (bird.x < p.x + p.w && bird.x + bird.w > p.x && 
-                   (bird.y < p.top || bird.y + bird.h > canvas.height - p.bottom)) {
+                p.x -= 3;
+                if (bird.x < p.x + p.w && bird.x + bird.w > p.x && (bird.y < p.top || bird.y + bird.h > canvas.height - p.bottom)) {
                     gameActive = false;
                     setTimeout(reset, 800);
                 }
-
                 if (p.x + p.w < 0) {
                     pipes.splice(i, 1);
                     score++;
@@ -99,22 +102,18 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Bird
-            ctx.fillStyle = "#f472b6";
-            ctx.fillRect(bird.x, bird.y, bird.w, bird.h);
-            ctx.strokeStyle = "#fff";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(bird.x, bird.y, bird.w, bird.h);
-
             // Draw Pipes
             ctx.fillStyle = "#1e293b";
             pipes.forEach(p => {
                 ctx.fillRect(p.x, 0, p.w, p.top);
                 ctx.fillRect(p.x, canvas.height - p.bottom, p.w, p.bottom);
-                ctx.strokeStyle = "#334155";
-                ctx.strokeRect(p.x, 0, p.w, p.top);
-                ctx.strokeRect(p.x, canvas.height - p.bottom, p.w, p.bottom);
             });
+
+            // Draw Bird
+            ctx.fillStyle = "#f472b6";
+            ctx.fillRect(bird.x, bird.y, bird.w, bird.h);
+            ctx.strokeStyle = "#fff";
+            ctx.strokeRect(bird.x, bird.y, bird.w, bird.h);
 
             update();
             requestAnimationFrame(draw);
