@@ -105,7 +105,7 @@
                     let angle = (Math.PI/4) * cp;
                     ball.dx = (ball.x < 300 ? 1 : -1) * ball.spd * Math.cos(angle);
                     ball.dy = ball.spd * Math.sin(angle);
-                    ball.spd += 0.2;
+                    ball.spd += 0.5;
                 }
 
                 if(ball.x < 0) { cScore++; document.getElementById("cS").innerText = cScore; reset(); }
