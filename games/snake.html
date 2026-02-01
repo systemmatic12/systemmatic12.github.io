@@ -3,84 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake | Neron's Hub</title>
-    <link rel="stylesheet" href="../style.css">
+    <title>Purple Snake | Neron's Hub</title>
     <style>
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        #gameCanvas {
-            background: #111;
-            border: 5px solid #a855f7; /* Purple border */
-            border-radius: 15px;
-        }
-        .score-board {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #a855f7;
-            margin-bottom: 10px;
-        }
+        :root { --sidebar-width: 260px; --accent: #a855f7; --bg: #f8fafc; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
+        nav { width: var(--sidebar-width); background: #fff; border-right: 1px solid #e2e8f0; padding: 2.5rem; position: fixed; height: 100vh; }
+        nav ul { list-style: none; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; }
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 3rem; display: flex; flex-direction: column; align-items: center; }
+        canvas { background: #111; border: 5px solid var(--accent); border-radius: 15px; touch-action: none; }
+        .score { font-size: 1.5rem; font-weight: bold; color: var(--accent); margin-bottom: 10px; }
+        @media (max-width: 768px) { body { flex-direction: column; } nav { width: 100%; height: auto; position: relative; padding: 1rem; } main { margin-left: 0; } }
     </style>
 </head>
 <body>
-
-    <nav>
-        <h2>Navigation</h2>
-        <ul>
-            <li><a href="../index.html">Home</a></li>
-            <li><a href="../games.html">Arcade</a></li>
-            <li><a href="../media.html">Media</a></li>
-            <li><a href="../guestbook.html">Guestbook</a></li>
-        </ul>
-    </nav>
-
-    <main class="game-container">
-        <h1>Purple Snake</h1>
-        <div class="score-board">Score: <span id="score">0</span></div>
-        
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
-
-        <p style="margin-top: 15px; color: #64748b;">Use Arrow Keys to Slither</p>
-        <a href="../games.html" class="back-link">← Back to Arcade</a>
+    <nav><ul><li><a href="../index.html">Home</a></li><li><a href="../games.html" style="color:var(--accent)">Arcade</a></li></ul></nav>
+    <main>
+        <div class="score">Score: <span id="score">0</span></div>
+        <canvas id="s" width="400" height="400"></canvas>
+        <a href="../games.html" style="margin-top:20px; color:#64748b; text-decoration:none;">← Back</a>
     </main>
-
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        const box = 20;
-
-        let score = 0;
-        let d;
-        let snake = [{ x: 9 * box, y: 10 * box }];
-        
-        // Safe spawn logic: Apple won't touch the walls
-        let food = {
-            x: Math.floor(Math.random() * 18 + 1) * box,
-            y: Math.floor(Math.random() * 18 + 1) * box
-        };
-
-        document.addEventListener("keydown", direction);
-
-        function direction(event) {
-            if(event.keyCode == 37 && d != "RIGHT") d = "LEFT";
-            else if(event.keyCode == 38 && d != "DOWN") d = "UP";
-            else if(event.keyCode == 39 && d != "LEFT") d = "RIGHT";
-            else if(event.keyCode == 40 && d != "UP") d = "DOWN";
+        const c=document.getElementById("s"), x=c.getContext("2d"), b=20;
+        let s=[{x:9*b,y:10*b}], d, f={x:Math.floor(Math.random()*18+1)*b,y:Math.floor(Math.random()*18+1)*b}, sc=0;
+        document.addEventListener("keydown", e=>{
+            if(e.keyCode==37 && d!="R") d="L"; if(e.keyCode==38 && d!="DN") d="UP";
+            if(e.keyCode==39 && d!="L") d="R"; if(e.keyCode==40 && d!="UP") d="DN";
+        });
+        function draw(){
+            x.fillStyle="#111"; x.fillRect(0,0,400,400);
+            for(let i=0;i<s.length;i++){
+                x.fillStyle=i==0?"#7e22ce":"#a855f7";
+                x.beginPath(); x.roundRect(s[i].x+1,s[i].y+1,b-2,b-2,5); x.fill();
+            }
+            x.fillStyle="#ef4444"; x.beginPath(); x.arc(f.x+10,f.y+10,8,0,7); x.fill(); // Apple
+            x.fillStyle="#22c55e"; x.fillRect(f.x+9,f.y+2,2,4); // Stem
+            let hX=s[0].x, hY=s[0].y;
+            if(d=="L") hX-=b; if(d=="UP") hY-=b; if(d=="R") hX+=b; if(d=="DN") hY+=b;
+            if(hX==f.x && hY==f.y){ sc++; document.getElementById("score").innerText=sc; f={x:Math.floor(Math.random()*18+1)*b,y:Math.floor(Math.random()*18+1)*b}; }
+            else s.pop();
+            let nH={x:hX,y:hY};
+            if(hX<0||hX>=400||hY<0||hY>=400||s.some(t=>t.x==nH.x&&t.y==nH.y)){ alert("Game Over"); location.reload(); }
+            s.unshift(nH);
         }
-
-        function drawApple(x, y) {
-            // Apple Body
-            ctx.fillStyle = "#ef4444";
-            ctx.beginPath();
-            ctx.arc(x + box/2, y + box/2, box/2 - 2, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Stem
-            ctx.fillStyle = "#22c55e";
-            ctx.fillRect(x + box/2 - 1, y + 2, 2, 5);
-        }
-
-        function collision(head, array) {
+        setInterval(draw,100);
+    </script>
+</body>
+</html>
