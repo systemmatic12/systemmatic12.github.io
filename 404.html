@@ -5,23 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Page Not Found</title>
     <style>
-        @media (max-width: 768px) {
-    body { flex-direction: column; }
-    
-    nav { 
-        width: 100%; height: auto; position: relative; 
-        padding: 1rem; border-right: none; border-bottom: 1px solid #eee;
-    }
-    
-    nav ul { display: flex; flex-wrap: wrap; gap: 10px; }
-    
-    main { margin-left: 0; padding: 1.5rem; width: 100%; }
-    
-    /* This part fixes your Games and Contact cards */
-    .container, .error-card, .contact-box { 
-        width: 100%; max-width: 100%; padding: 1.5rem; 
-    }
-}
         :root { 
             --sidebar-width: 260px; 
             --accent: #6366f1; 
@@ -39,7 +22,7 @@
             min-height: 100vh; 
         }
 
-        /* Sidebar Navigation (Same as index.html) */
+        /* Sidebar Navigation */
         nav { 
             width: var(--sidebar-width); 
             background: #ffffff; 
@@ -49,6 +32,7 @@
             height: 100vh; 
             display: flex; 
             flex-direction: column; 
+            z-index: 100; /* Keeps nav on top */
         }
 
         nav h2 { 
@@ -110,16 +94,36 @@
             background: #f8fafc; font-family: inherit;
         }
 
+        /* Combined Mobile Styles - All in one place at the bottom */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            nav { width: 100%; height: auto; position: relative; padding: 1.5rem; }
-            main { margin-left: 0; padding: 2rem; }
+            
+            nav { 
+                width: 100%; height: auto; position: relative; 
+                padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0;
+            }
+            
+            nav ul { 
+                display: flex; 
+                flex-wrap: wrap; 
+                gap: 15px; 
+                justify-content: center; 
+            }
+
+            nav li { margin-bottom: 0; }
+            
+            main { margin-left: 0; padding: 2rem; width: 100%; }
+            
+            .error-card { 
+                padding: 2rem; 
+                border-radius: 16px;
+            }
         }
     </style>
 </head>
 <body>
 
-        <nav>
+    <nav>
         <h2>Navigation</h2>
         <ul>
             <li><a href="index">Home</a></li>
@@ -127,7 +131,7 @@
             <li><a href="contact">Contact</a></li>
             <li><a href="guestbook">Guestbook</a></li>
             <li><a href="journal">Journal</a></li>
-             <li><a href="media">Media</a></li>
+            <li><a href="media">Media</a></li>
             <li><a href="privacy">Privacy Policy</a></li>
         </ul>
     </nav>
