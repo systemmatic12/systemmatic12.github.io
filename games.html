@@ -4,14 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arcade | Neron's Hub</title>
-    <link rel="stylesheet" href="style.css"> <style>
-        /* Specific Grid Styling for this page */
-        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-        .game-card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; transition: 0.3s; }
-        .game-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .game-preview { height: 150px; background: #1e293b; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+    <link rel="stylesheet" href="style.css"> 
+    
+    <style>
+        /* --- Sidebar Navigation Styles (Synced with Index) --- */
+        :root { 
+            --sidebar-width: 260px; 
+            --accent: #6366f1; 
+            --bg: #f8fafc; 
+            --text: #1e293b; 
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            display: flex; 
+            min-height: 100vh; 
+        }
+
+        nav { 
+            width: var(--sidebar-width); 
+            background: #fff; 
+            border-right: 1px solid #e2e8f0; 
+            padding: 2.5rem; 
+            position: fixed; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        nav h2 { 
+            font-size: 0.8rem; 
+            color: #94a3b8; 
+            text-transform: uppercase; 
+            margin-bottom: 2rem; 
+            letter-spacing: 0.1rem; 
+        }
+        
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1.2rem; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
+        nav a:hover { color: var(--accent); }
+
+        /* --- Main Content Layout --- */
+        main { 
+            margin-left: var(--sidebar-width); 
+            flex-grow: 1; 
+            padding: 4rem; 
+            width: 100%; 
+        }
+
+        /* --- Arcade Specific Grid Styling --- */
+        .games-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 25px; 
+            max-width: 1100px;
+            margin-top: 2rem;
+        }
+        
+        .game-card { 
+            background: white; 
+            border-radius: 16px; 
+            border: 1px solid #e2e8f0; 
+            overflow: hidden; 
+            transition: 0.3s; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .game-card:hover { 
+            transform: translateY(-5px); 
+            border-color: var(--accent); 
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1);
+        }
+        
+        .game-preview { 
+            height: 150px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-weight: bold; 
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+        
         .game-info { padding: 1.5rem; }
-        .play-btn { display: inline-block; background: var(--accent); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; margin-top: 10px; }
+        
+        .play-btn { 
+            display: inline-block; 
+            background: var(--accent); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-size: 0.9rem; 
+            margin-top: 10px; 
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        
+        .play-btn:hover { opacity: 0.9; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) { 
+            body { flex-direction: column; } 
+            nav { width: 100%; height: auto; position: relative; padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0; } 
+            main { margin-left: 0; padding: 2rem; } 
+        }
     </style>
 </head>
 <body>
@@ -23,14 +125,14 @@
             <li><a href="contact">Contact</a></li>
             <li><a href="guestbook">Guestbook</a></li>
             <li><a href="journal">Journal</a></li>
-             <li><a href="media">Media</a></li>
+            <li><a href="media">Media</a></li>
             <li><a href="privacy">Privacy Policy</a></li>
         </ul>
     </nav>
 
     <main>
-        <h1>Neron's Arcade</h1>
-        <p>Select a game below. All games are built with JavaScript.</p>
+        <h1 style="font-size: 3rem; color: #0f172a; margin-bottom: 0.5rem;">Neron's Arcade</h1>
+        <p style="color: #64748b; font-size: 1.1rem;">Select a game below. All games are built with JavaScript.</p>
         
         <div class="games-grid">
             <div class="game-card">
@@ -58,7 +160,7 @@
             </div>
 
             <div class="game-card">
-                <div class="game-preview" style="background:#3b82f6;">Pong</div>
+                <div class="game-preview" style="background:#3b82f6;">PONG</div>
                 <div class="game-info">
                     <h3>Pong</h3>
                     <a href="games/pong.html" class="play-btn">Play Now</a>
@@ -66,7 +168,7 @@
             </div>
             
             <div class="game-card">
-                <div class="game-preview" style="background:#8b5cf6;">Space Invaders</div>
+                <div class="game-preview" style="background:#8b5cf6;">SPACE INVADERS</div>
                 <div class="game-info">
                     <h3>Space Invaders</h3>
                     <a href="games/invaders.html" class="play-btn">Play Now</a>
@@ -74,13 +176,10 @@
             </div>
             
             <div class="game-card">
-                <div class="game-preview" style="background:#f472b6;">Flappy Bird</div>
+                <div class="game-preview" style="background:#f472b6;">FLAPPY BIRD</div>
                 <div class="game-info">
                     <h3>Flappy Bird</h3>
                     <a href="games/flappy.html" class="play-btn">Play Now</a>
-                           </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
