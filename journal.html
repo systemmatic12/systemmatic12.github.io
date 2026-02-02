@@ -2,19 +2,107 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neron's Journal</title>
     <style>
-        :root { --sidebar-width: 260px; --accent: #6366f1; --bg: #f8fafc; }
-        body { font-family: sans-serif; display: flex; margin: 0; background: var(--bg); }
-        nav { width: var(--sidebar-width); background: #fff; height: 100vh; padding: 2.5rem; position: fixed; border-right: 1px solid #e2e8f0; }
-        nav a { color: #64748b; text-decoration: none; display: block; margin-bottom: 1.2rem; font-weight: 600; }
-        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 4rem; display: flex; flex-direction: column; align-items: center; }
-        .post { background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 800px; width: 100%; margin-bottom: 2.5rem; border-left: 5px solid var(--accent); }
-        .date { font-weight: bold; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+        :root { 
+            --sidebar-width: 260px; 
+            --accent: #6366f1; 
+            --bg: #f8fafc; 
+            --text: #1e293b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+            display: flex; 
+            min-height: 100vh; 
+            background: var(--bg); 
+            color: var(--text);
+        }
+
+        /* Sidebar Navigation - Synced Style */
+        nav { 
+            width: var(--sidebar-width); 
+            background: #fff; 
+            height: 100vh; 
+            padding: 2.5rem; 
+            position: fixed; 
+            border-right: 1px solid #e2e8f0; 
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        nav h2 { 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1rem; 
+            margin-bottom: 2rem; 
+            color: #94a3b8;
+        }
+
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1.2rem; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; display: block; }
+        nav a:hover { color: var(--accent); }
+
+        /* Main Content Area */
+        main { 
+            margin-left: var(--sidebar-width); 
+            flex-grow: 1; 
+            padding: 4rem; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        h1 { font-size: 3rem; margin-bottom: 2.5rem; color: #0f172a; }
+
+        .post { 
+            background: white; 
+            padding: 2.5rem; 
+            border-radius: 24px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            max-width: 800px; 
+            width: 100%; 
+            margin-bottom: 2.5rem; 
+            border-left: 5px solid var(--accent); 
+            transition: transform 0.3s ease;
+        }
+
+        .post:hover { transform: translateX(5px); }
+        
+        .date { 
+            font-weight: bold; 
+            color: var(--accent); 
+            font-size: 0.9rem; 
+            text-transform: uppercase; 
+            margin-bottom: 0.5rem; 
+            display: block; 
+        }
+
+        .post h2 { margin-bottom: 1rem; color: #0f172a; }
+        .post p { line-height: 1.6; color: #475569; white-space: pre-line; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { 
+                width: 100%; height: auto; position: relative; 
+                padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0;
+            }
+            nav ul { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
+            nav li { margin-bottom: 0; }
+            main { margin-left: 0; padding: 2rem; width: 100%; }
+            .post { padding: 1.5rem; }
+        }
     </style>
 </head>
 <body>
-        <nav>
+
+    <nav>
         <h2>Navigation</h2>
         <ul>
             <li><a href="index">Home</a></li>
@@ -22,26 +110,28 @@
             <li><a href="contact">Contact</a></li>
             <li><a href="guestbook">Guestbook</a></li>
             <li><a href="journal">Journal</a></li>
-             <li><a href="media">Media</a></li>
+            <li><a href="media">Media</a></li>
             <li><a href="privacy">Privacy Policy</a></li>
         </ul>
     </nav>
+
     <main>
-        <h1 style="font-size: 2.5rem; margin-bottom: 2rem;">My Journal</h1>
+        <h1>My Journal</h1>
 
         <article class="post">
             <span class="date">February 1, 2026</span>
             <h2>Mouse</h2>
-            <p> WAKE UP
-            
-            ITS THE FIRST OF THE MONTH🔥🔥🔥🔥🔥🔥
+            <p>WAKE UP! ITS THE FIRST OF THE MONTH🔥🔥🔥🔥🔥🔥
+
             Jokes aside, yesterday i got a wireless pc mouse! im really happy because the cable would always piss me off and me and sister would always fight over it. k bye</p>
         </article>
+
         <article class="post">
             <span class="date">January 31, 2026</span>
             <h2>Haircut</h2>
-            <p> its a wonderful day today! after my dad is done showering we are going out to get haircuts, and im really excited for how this day is going to go. i will update when something else happens</p>
+            <p>its a wonderful day today! after my dad is done showering we are going out to get haircuts, and im really excited for how this day is going to go. i will update when something else happens</p>
         </article>
+
         <article class="post">
             <span class="date">January 30, 2026</span>
             <h2>Website</h2>
@@ -49,11 +139,13 @@
             
             i just added a guest book, my dad shared my website with my entire family and they were so supportive, i love my family :D</p>
         </article>
+
         <article class="post">
-            <span class="date">December 2, 2018 (big chungus day) </span>
+            <span class="date">December 2, 2018 (big chungus day)</span>
             <h2>test</h2>
-            <p> this is a test of me trying to copy paste the preset of january 30th, if it worked properly then they should pop up right next to it (yay it worked) </p>
+            <p>this is a test of me trying to copy paste the preset of january 30th, if it worked properly then they should pop up right next to it (yay it worked)</p>
         </article>
     </main>
+
 </body>
 </html>
