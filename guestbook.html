@@ -2,28 +2,91 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neron's Guestbook</title>
     <style>
-        :root { --sidebar-width: 260px; --accent: #6366f1; --bg: #f8fafc; }
-        body { font-family: sans-serif; display: flex; margin: 0; background: var(--bg); }
-        
-        nav { 
-            width: var(--sidebar-width); background: #fff; height: 100vh; 
-            padding: 2.5rem; position: fixed; border-right: 1px solid #e2e8f0; 
+        :root { 
+            --sidebar-width: 260px; 
+            --accent: #6366f1; 
+            --bg: #f8fafc; 
+            --text: #1e293b;
         }
-        nav a { color: #64748b; text-decoration: none; display: block; margin-bottom: 1.2rem; font-weight: 600; }
-        nav a:hover { color: var(--accent); }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 4rem; display: flex; justify-content: center; }
-        .content-box { background: white; padding: 3rem; border-radius: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 800px; }
+        body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+            display: flex; 
+            min-height: 100vh; 
+            background: var(--bg); 
+            color: var(--text);
+        }
+
+        /* Sidebar Navigation - Synced Style */
+        nav { 
+            width: var(--sidebar-width); 
+            background: #fff; 
+            height: 100vh; 
+            padding: 2.5rem; 
+            position: fixed; 
+            border-right: 1px solid #e2e8f0; 
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        nav h2 { 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1rem; 
+            margin-bottom: 2rem; 
+            color: #94a3b8;
+        }
+
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1.2rem; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; display: block; }
+        nav a:hover { color: var(--accent); }
+
+        /* Main Content Area */
+        main { 
+            margin-left: var(--sidebar-width); 
+            flex-grow: 1; 
+            padding: 4rem; 
+            display: flex; 
+            justify-content: center; 
+        }
+
+        .content-box { 
+            background: white; 
+            padding: 3rem; 
+            border-radius: 24px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            width: 100%; 
+            max-width: 800px; 
+            height: fit-content;
+        }
         
         h1 { margin-bottom: 1rem; color: #0f172a; }
         p { color: #64748b; margin-bottom: 2rem; }
+
+        /* Mobile Responsiveness - Fixed the missing block */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { 
+                width: 100%; height: auto; position: relative; 
+                padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0;
+            }
+            nav ul { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
+            nav li { margin-bottom: 0; }
+            main { margin-left: 0; padding: 2rem; width: 100%; }
+            .content-box { padding: 2rem; border-radius: 16px; }
+        }
     </style>
 </head>
 <body>
 
-        <nav>
+    <nav>
         <h2>Navigation</h2>
         <ul>
             <li><a href="index">Home</a></li>
@@ -31,7 +94,7 @@
             <li><a href="contact">Contact</a></li>
             <li><a href="guestbook">Guestbook</a></li>
             <li><a href="journal">Journal</a></li>
-             <li><a href="media">Media</a></li>
+            <li><a href="media">Media</a></li>
             <li><a href="privacy">Privacy Policy</a></li>
         </ul>
     </nav>
