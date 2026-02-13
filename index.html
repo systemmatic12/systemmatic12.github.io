@@ -3,38 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Gallery | Neron's Hub</title>
+    <title>Neron's Hub</title>
     <style>
-        :root { 
-            --sidebar-width: 260px; 
-            --accent: #6366f1; 
-            --bg: #f8fafc; 
-            --text: #1e293b; 
-        }
-        
+        :root { --sidebar-width: 260px; --accent: #6366f1; --bg: #f8fafc; --text: #1e293b; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
 
-        /* Sidebar Navigation - Synchronized with Index */
-        nav { 
-            width: var(--sidebar-width); 
-            background: #ffffff; 
-            border-right: 1px solid #e2e8f0; 
-            padding: 2.5rem; 
-            position: fixed; 
-            height: 100vh; 
-            display: flex;
-            flex-direction: column;
-        }
-        
-        nav h2 { 
-            font-size: 0.8rem; 
-            color: #94a3b8; 
-            text-transform: uppercase; 
-            margin-bottom: 2rem; 
-            letter-spacing: 0.1rem;
-        }
-        
+        /* Sidebar Navigation */
+        nav { width: var(--sidebar-width); background: #fff; border-right: 1px solid #e2e8f0; padding: 2.5rem; position: fixed; height: 100vh; display: flex; flex-direction: column; }
+        nav h2 { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 2rem; letter-spacing: 0.1rem; }
         nav ul { list-style: none; }
         nav li { margin-bottom: 1.2rem; }
         nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
@@ -42,80 +19,35 @@
 
         /* Main Content */
         main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 4rem; width: 100%; }
-        
-        .header-box { 
+        .header-box { background: white; padding: 3rem; border-radius: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 3rem; max-width: 1100px; margin: 0 auto 3rem auto; }
+        h1 { font-size: 3.5rem; margin-bottom: 1rem; color: #0f172a; line-height: 1.1; }
+
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto; }
+
+        /* The Journal Link Card with Hover Effect */
+        .card-link { text-decoration: none; color: inherit; display: block; }
+        .card { 
             background: white; 
-            padding: 3rem; 
-            border-radius: 24px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
-            margin-bottom: 3rem; 
-            max-width: 1100px; 
-            margin: 0 auto 3rem auto; 
+            padding: 2.5rem; 
+            border-radius: 20px; 
+            border: 1px solid #e2e8f0; 
+            height: 100%;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
         }
 
-        h1 { font-size: 3.5rem; color: #0f172a; margin-bottom: 1rem; line-height: 1.1; }
-
-        /* --- MEDIA GRID --- */
-        .media-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .media-item {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-            transition: 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .media-item:hover {
-            transform: translateY(-10px);
-            border-color: var(--accent);
+        /* Mouse hover: turns blue and lifts up */
+        .card-link:hover .card { 
+            transform: translateY(-10px); 
+            border-color: var(--accent); 
             box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1);
         }
+        
+        .card h3 { margin-bottom: 1rem; color: #0f172a; }
 
-        /* Responsive Video Container */
-        .video-container {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-        }
-
-        .video-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .media-item img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .media-info { padding: 1.5rem; flex-grow: 1; }
-        .media-info h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #0f172a; }
-        .media-info p { font-size: 0.95rem; color: #64748b; line-height: 1.5; }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            nav { width: 100%; height: auto; position: relative; padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0; }
-            nav ul { display: flex; flex-wrap: wrap; gap: 15px; }
-            nav li { margin-bottom: 0; }
-            main { margin-left: 0; padding: 2rem; }
-            h1 { font-size: 2.5rem; }
-        }
+        @media (max-width: 768px) { body { flex-direction: column; } nav { width: 100%; height: auto; position: relative; padding: 1.5rem; } main { margin-left: 0; padding: 2rem; } }
     </style>
 </head>
 <body>
-
     <nav>
         <h2>Navigation</h2>
         <ul>
@@ -124,55 +56,43 @@
             <li><a href="contact">Contact</a></li>
             <li><a href="guestbook">Guestbook</a></li>
             <li><a href="journal">Journal</a></li>
-            <li><a href="media">Media</a></li>
+             <li><a href="media">Media</a></li>
             <li><a href="privacy">Privacy Policy</a></li>
+            <li style="margin-top: 2rem;">
+    </a>
+</li>
         </ul>
     </nav>
-
     <main>
         <div class="header-box">
-            <h1>Media Gallery</h1>
-            <p style="font-size: 1.2rem; color: #64748b;">A collection of tests, clips, and random things I've found or made.</p>
+            <h1>Hi, I'm Neron! :)</h1>
+            <p style="font-size: 1.3rem; color: #64748b; line-height: 1.6;">
+                Welcome to my corner of the web. I've always wanted to have my own land on the internet and I can finally do that so that's awesome.
+            </p>
         </div>
 
-        <div class="media-grid">
-            <div class="media-item">
-                <img src="media/coolest.jpg" alt="test">
-                <div class="media-info">
-                    <h3>Testing Media</h3>
-                    <p>I added a new subdomain and I'm making a test thing.</p>
+        <div class="content-grid">
+            <a href="journal" class="card-link">
+                <div class="card">
+                    <h3>My Story</h3>
+                    <p>This is where I'm just going to write stuff about my life. Expect the unexpected. Click here to read my journal.</p>
                 </div>
-            </div>
+            </a>
 
-            <div class="media-item">
-                <div class="video-container">
-                    <iframe 
-                        src="https://www.youtube.com/embed/woOvgPzaPwk" 
-                        title="YouTube video player" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        allowfullscreen>
-                    </iframe>
-                </div>
-                <div class="media-info">
-                    <h3>Gameplay</h3>
-                    <p>Here is some Geometry Dash gameplay I did instead of coding for this website.</p>
-                </div>
+            <div class="card">
+                <h3>What is this?</h3>
+                <p>My website.</p>
             </div>
-
-            <div class="media-item">
-                <img src="media/buggin-out.png" alt="bug">
-                <div class="media-info">
-                    <h3>Whoops!</h3>
-                    <p>I accidentally forgot to close the div while coding, here was the result.</p>
-                </div>
+            
+            <div class="card">
+                <h3>Latest</h3>
+                <p>A summary of my day or whatever I have done.</p>
             </div>
         </div>
-
         <footer style="margin-top: 5rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 0.9rem; text-align: center;">
-            <p>&copy; 2026 Neron's Web Hub.</p>
-        </footer>
+    <p>&copy; 2026 Neron's Web Hub.</p>
+</footer>
     </main>
-
     <script data-goatcounter="https://systemmatic12.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>
