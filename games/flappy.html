@@ -5,27 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flappy Bird | Neron's Hub</title>
     <style>
-        :root { --sidebar-width: 260px; --accent: #f472b6; --bg: #f8fafc; --text: #1e293b; }
+        /* Color Palette: White (#ffffff), Pink (#f472b6), Indigo (#4338ca) */
+        :root { 
+            --sidebar-width: 260px; 
+            --accent-pink: #f472b6; 
+            --deep-indigo: #4338ca;
+            --bg-white: #ffffff; 
+            --text-main: #4338ca; 
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow: hidden; }
         
-        /* White Sidebar - Matching your site */
-        nav { width: var(--sidebar-width); background: #fffff; border-right: 1px solid #e2e8f0; padding: 2.5rem; position: fixed; height: 100vh; }
-        nav h2 { font-size: 0.8rem; color: #94a3b8; letter-spacing: 1px; margin-bottom: 2rem; text-transform: uppercase; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-white); 
+            color: var(--text-main); 
+            display: flex; 
+            min-height: 100vh; 
+            overflow: hidden; 
+        }
+        
+        /* Sidebar Navigation */
+        nav { 
+            width: var(--sidebar-width); 
+            background: var(--bg-white); 
+            border-right: 2px solid #f1f5f9; 
+            padding: 2.5rem; 
+            position: fixed; 
+            height: 100vh; 
+        }
+        
+        nav h2 { 
+            font-size: 0.8rem; 
+            color: var(--accent-pink); 
+            letter-spacing: 2px; 
+            margin-bottom: 2rem; 
+            text-transform: uppercase; 
+        }
+        
         nav ul { list-style: none; }
         nav li { margin-bottom: 1.2rem; }
-        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
-        nav a:hover { color: var(--accent); }
+        nav a { 
+            text-decoration: none; 
+            color: var(--deep-indigo); 
+            font-weight: 700; 
+            transition: 0.3s; 
+            opacity: 0.6;
+        }
+        
+        nav a:hover { opacity: 1; color: var(--accent-pink); }
 
-        /* Game Content */
-        main { margin-left: var(--sidebar-width); flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        canvas { background: #e8e8e8; border: 4px solid var(--accent); border-radius: 12px; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .score { font-size: 3rem; color: var(--accent); font-family: 'Courier New', monospace; margin-bottom: 10px; font-weight: bold; }
+        /* Game Area */
+        main { 
+            margin-left: var(--sidebar-width); 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            background: #fff;
+        }
+
+        canvas { 
+            background: #fff; 
+            border: 6px solid var(--deep-indigo); 
+            border-radius: 20px; 
+            cursor: pointer; 
+            box-shadow: 0 20px 40px rgba(67, 56, 202, 0.1); 
+        }
+
+        .score { 
+            font-size: 4rem; 
+            color: var(--accent-pink); 
+            font-family: 'Inter', sans-serif; 
+            margin-bottom: 10px; 
+            font-weight: 900; 
+        }
+        
+        .controls-hint {
+            margin-top: 15px; 
+            color: var(--deep-indigo); 
+            font-weight: 600; 
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .back-link {
+            margin-top:25px; 
+            color: var(--accent-pink); 
+            text-decoration: none; 
+            font-weight: 800; 
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
         
         @media (max-width: 768px) { 
             body { flex-direction: column; } 
-            nav { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid #e2e8f0; padding: 1.5rem; } 
-            main { margin-left: 0; padding: 1rem; } 
+            nav { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 2px solid #f1f5f9; padding: 1.5rem; } 
+            main { margin-left: 0; padding: 2rem; } 
         }
     </style>
 </head>
@@ -34,7 +111,7 @@
         <h2>Navigation</h2>
         <ul>
             <li><a href="../index.html">Home</a></li>
-            <li><a href="../games.html" style="color: var(--accent);">Arcade</a></li>
+            <li><a href="../games.html" style="color: var(--accent-pink); opacity: 1;">Arcade</a></li>
             <li><a href="../media.html">Media</a></li>
             <li><a href="../guestbook.html">Guestbook</a></li>
         </ul>
@@ -43,13 +120,18 @@
     <main>
         <div class="score" id="scoreVal">0</div>
         <canvas id="flappyCanvas" width="400" height="500"></canvas>
-        <p style="margin-top: 15px; color: #64748b; font-weight: 500;">[ SPACE ] or [ CLICK ] TO JUMP</p>
-        <a href="../games.html" style="margin-top:20px; color:var(--accent); text-decoration:none; font-weight:bold; font-size: 0.9rem;">← BACK TO ARCADE</a>
+        <p class="controls-hint">[ SPACE ] OR [ CLICK ] TO JUMP</p>
+        <a href="../games.html" class="back-link">← Back to Arcade</a>
     </main>
 
     <script>
         const canvas = document.getElementById("flappyCanvas");
         const ctx = canvas.getContext("2d");
+
+        // Game Constants
+        const PINK = "#f472b6";
+        const INDIGO = "#4338ca";
+        const WHITE = "#ffffff";
 
         let bird = { x: 50, y: 150, w: 30, h: 30, gravity: 0.5, velocity: 0, jump: -7 };
         let pipes = [];
@@ -58,10 +140,10 @@
         let gameActive = true;
 
         function createPipe() {
-            let gap = 140;
+            let gap = 150; // Slightly larger gap for smoother feel
             let minHeight = 50;
             let height = Math.floor(Math.random() * (canvas.height - gap - minHeight * 2)) + minHeight;
-            pipes.push({ x: canvas.width, top: height, bottom: canvas.height - height - gap, w: 65 });
+            pipes.push({ x: canvas.width, top: height, bottom: canvas.height - height - gap, w: 60 });
         }
 
         function reset() {
@@ -77,52 +159,16 @@
             bird.velocity += bird.gravity;
             bird.y += bird.velocity;
 
+            // Ceiling and Floor Collision
             if (bird.y + bird.h > canvas.height || bird.y < 0) {
                 gameActive = false;
                 setTimeout(reset, 800);
             }
 
-            if (frame % 90 === 0) createPipe();
+            if (frame % 100 === 0) createPipe();
 
             pipes.forEach((p, i) => {
                 p.x -= 3;
-                if (bird.x < p.x + p.w && bird.x + bird.w > p.x && (bird.y < p.top || bird.y + bird.h > canvas.height - p.bottom)) {
-                    gameActive = false;
-                    setTimeout(reset, 800);
-                }
-                if (p.x + p.w < 0) {
-                    pipes.splice(i, 1);
-                    score++;
-                    document.getElementById("scoreVal").innerText = score;
-                }
-            });
-            frame++;
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw Pipes
-            ctx.fillStyle = "#1e293b";
-            pipes.forEach(p => {
-                ctx.fillRect(p.x, 0, p.w, p.top);
-                ctx.fillRect(p.x, canvas.height - p.bottom, p.w, p.bottom);
-            });
-
-            // Draw Bird
-            ctx.fillStyle = "#f472b6";
-            ctx.fillRect(bird.x, bird.y, bird.w, bird.h);
-            ctx.strokeStyle = "#fff";
-            ctx.strokeRect(bird.x, bird.y, bird.w, bird.h);
-
-            update();
-            requestAnimationFrame(draw);
-        }
-
-        window.addEventListener("keydown", e => { if (e.code === "Space") bird.velocity = bird.jump; });
-        canvas.addEventListener("mousedown", () => { bird.velocity = bird.jump; });
-
-        draw();
-    </script>
-</body>
-</html>
+                
+                // Collision Logic
+                if (
