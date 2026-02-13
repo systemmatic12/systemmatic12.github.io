@@ -171,4 +171,62 @@
                 p.x -= 3;
                 
                 // Collision Logic
-                if (
+                if (bird.x < p.x + p.w && 
+                    bird.x + bird.w > p.x && 
+                    (bird.y < p.top || bird.y + bird.h > canvas.height - p.bottom)) {
+                    gameActive = false;
+                    setTimeout(reset, 800);
+                }
+
+                // Scoring
+                if (p.x + p.w < 0) {
+                    pipes.splice(i, 1);
+                    score++;
+                    document.getElementById("scoreVal").innerText = score;
+                }
+            });
+            frame++;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Pipes (Indigo)
+            ctx.fillStyle = INDIGO;
+            pipes.forEach(p => {
+                // Top Pipe
+                ctx.fillRect(p.x, 0, p.w, p.top);
+                // Bottom Pipe
+                ctx.fillRect(p.x, canvas.height - p.bottom, p.w, p.bottom);
+            });
+
+            // Draw Bird (Pink)
+            ctx.fillStyle = PINK;
+            ctx.beginPath();
+            ctx.roundRect(bird.x, bird.y, bird.w, bird.h, 8); // Rounded bird for modern look
+            ctx.fill();
+            
+            // Bird Eye (White)
+            ctx.fillStyle = WHITE;
+            ctx.fillRect(bird.x + 18, bird.y + 6, 6, 6);
+
+            update();
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener("keydown", e => { 
+            if (e.code === "Space") {
+                e.preventDefault(); // Stop page scrolling
+                bird.velocity = bird.jump; 
+            }
+        });
+        
+        canvas.addEventListener("mousedown", (e) => { 
+            e.preventDefault();
+            bird.velocity = bird.jump; 
+        });
+
+        draw();
+    </script>
+</body>
+</html>
