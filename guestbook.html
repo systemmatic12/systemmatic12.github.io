@@ -52,7 +52,7 @@
         main { 
             margin-left: var(--sidebar-width); 
             flex-grow: 1; 
-            padding: 4rem; 
+            padding: 4rem 2rem; /* Adjusted padding for better fit */
             display: flex; 
             justify-content: center; 
         }
@@ -63,14 +63,14 @@
             border-radius: 24px; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
             width: 100%; 
-            max-width: 800px; 
+            max-width: 1100px; /* Increased from 800px to 1100px */
             height: fit-content;
         }
         
         h1 { margin-bottom: 1rem; color: #0f172a; }
         p { color: #64748b; margin-bottom: 2rem; }
 
-        /* Mobile Responsiveness - Fixed the missing block */
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             nav { 
