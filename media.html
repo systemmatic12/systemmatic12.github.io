@@ -15,28 +15,58 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
 
-        /* Sidebar Navigation */
-        nav { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid #e2e8f0; padding: 2.5rem; position: fixed; height: 100vh; }
-        nav h2 { font-size: 0.85rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 2rem; }
-        nav nav ul { list-style: none; }
+        /* Sidebar Navigation - Synchronized with Index */
+        nav { 
+            width: var(--sidebar-width); 
+            background: #ffffff; 
+            border-right: 1px solid #e2e8f0; 
+            padding: 2.5rem; 
+            position: fixed; 
+            height: 100vh; 
+            display: flex;
+            flex-direction: column;
+        }
+        
+        nav h2 { 
+            font-size: 0.8rem; 
+            color: #94a3b8; 
+            text-transform: uppercase; 
+            margin-bottom: 2rem; 
+            letter-spacing: 0.1rem;
+        }
+        
+        nav ul { list-style: none; }
         nav li { margin-bottom: 1.2rem; }
         nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
         nav a:hover { color: var(--accent); }
 
         /* Main Content */
-        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 3rem; }
-        h1 { font-size: 2.5rem; color: #0f172a; margin-bottom: 2rem; }
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 4rem; width: 100%; }
+        
+        .header-box { 
+            background: white; 
+            padding: 3rem; 
+            border-radius: 24px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            margin-bottom: 3rem; 
+            max-width: 1100px; 
+            margin: 0 auto 3rem auto; 
+        }
+
+        h1 { font-size: 3.5rem; color: #0f172a; margin-bottom: 1rem; line-height: 1.1; }
 
         /* --- MEDIA GRID --- */
         .media-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
         .media-item {
             background: white;
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
             border: 1px solid #e2e8f0;
             transition: 0.3s ease;
@@ -45,15 +75,15 @@
         }
 
         .media-item:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px);
             border-color: var(--accent);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1);
         }
 
         /* Responsive Video Container */
         .video-container {
             width: 100%;
-            aspect-ratio: 16 / 9; /* Keeps widescreen look */
+            aspect-ratio: 16 / 9;
             background: #000;
         }
 
@@ -70,15 +100,17 @@
             display: block;
         }
 
-        .media-info { padding: 1.2rem; flex-grow: 1; }
-        .media-info h3 { font-size: 1.1rem; margin-bottom: 0.3rem; color: #0f172a; }
-        .media-info p { font-size: 0.9rem; color: #64748b; line-height: 1.4; }
+        .media-info { padding: 1.5rem; flex-grow: 1; }
+        .media-info h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #0f172a; }
+        .media-info p { font-size: 0.95rem; color: #64748b; line-height: 1.5; }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
             nav { width: 100%; height: auto; position: relative; padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0; }
             nav ul { display: flex; flex-wrap: wrap; gap: 15px; }
-            main { margin-left: 0; padding: 1.5rem; }
+            nav li { margin-bottom: 0; }
+            main { margin-left: 0; padding: 2rem; }
+            h1 { font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -92,23 +124,23 @@
             <li><a href="contact">Contact</a></li>
             <li><a href="guestbook">Guestbook</a></li>
             <li><a href="journal">Journal</a></li>
-             <li><a href="media">Media</a></li>
+            <li><a href="media">Media</a></li>
             <li><a href="privacy">Privacy Policy</a></li>
-            <li style="margin-top: 2rem;">
-    </a>
-</li>
         </ul>
     </nav>
 
     <main>
-        <h1>Media Gallery</h1>
+        <div class="header-box">
+            <h1>Media Gallery</h1>
+            <p style="font-size: 1.2rem; color: #64748b;">A collection of tests, clips, and random things I've found or made.</p>
+        </div>
 
         <div class="media-grid">
             <div class="media-item">
                 <img src="media/coolest.jpg" alt="test">
                 <div class="media-info">
-                    <h3>testing media</h3>
-                    <p>i added a new subdomain adn im making a test thing.</p>
+                    <h3>Testing Media</h3>
+                    <p>I added a new subdomain and I'm making a test thing.</p>
                 </div>
             </div>
 
@@ -122,19 +154,26 @@
                     </iframe>
                 </div>
                 <div class="media-info">
-                    <h3>gameplay</h3>
-                    <p>here is some geometry dash game play i did instead of coding for this website</p>
+                    <h3>Gameplay</h3>
+                    <p>Here is some Geometry Dash gameplay I did instead of coding for this website.</p>
                 </div>
             </div>
 
             <div class="media-item">
                 <img src="media/buggin-out.png" alt="bug">
                 <div class="media-info">
-                    <h3>whoops!</h3>
-                    <p>i accidentally forgot to close the div while coding, here was the result.</p>
+                    <h3>Whoops!</h3>
+                    <p>I accidentally forgot to close the div while coding, here was the result.</p>
                 </div>
             </div>
         </div>
+
+        <footer style="margin-top: 5rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 0.9rem; text-align: center;">
+            <p>&copy; 2026 Neron's Web Hub.</p>
+        </footer>
     </main>
+
+    <script data-goatcounter="https://systemmatic12.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
