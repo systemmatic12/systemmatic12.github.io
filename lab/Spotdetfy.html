@@ -1,205 +1,178 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Home, 
-  Search, 
-  Library, 
-  PlusSquare, 
-  Heart, 
-  Play, 
-  Pause, 
-  SkipBack, 
-  SkipForward, 
-  Repeat, 
-  Shuffle, 
-  Volume2, 
-  MoreHorizontal,
-  Clock
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotdetfy - Web Player</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Figtree', sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+        }
+        /* Custom scrollbar for that Spotify look */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .glass-header {
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-const Spotdetfy = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState(null);
-  const [progress, setProgress] = useState(30);
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-  const featuredPlaylists = [
-    { id: 1, title: "Lofi Beats", artist: "Chill Study Music", cover: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=300&h=300&fit=crop" },
-    { id: 2, title: "Deep Focus", artist: "Ambient Noise", cover: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=300&h=300&fit=crop" },
-    { id: 3, title: "Night Rider", artist: "Synthwave Essentials", cover: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=300&h=300&fit=crop" },
-    { id: 4, title: "Morning Coffee", artist: "Acoustic Hits", cover: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&h=300&fit=crop" },
-    { id: 5, title: "Rock Classics", artist: "Legendary Anthems", cover: "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=300&h=300&fit=crop" },
-  ];
+        // Simple SVG Icons to replace Lucide since we are in a single HTML file
+        const Icons = {
+            Home: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+            Search: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+            Library: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 16h8"/><path d="M7 11h12"/><path d="M7 6h3"/></svg>,
+            Play: (props) => <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" {...props}><polygon points="5 3 19 12 5 21 5 3"/></svg>,
+            Pause: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>,
+            SkipBack: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>,
+            SkipForward: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>,
+            Heart: (props) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        };
 
-  const recentTracks = [
-    { id: 101, title: "Midnight City", artist: "M83", album: "Hurry Up, We're Dreaming", duration: "4:03" },
-    { id: 102, title: "Starboy", artist: "The Weeknd", album: "Starboy", duration: "3:50" },
-    { id: 103, title: "Levitating", artist: "Dua Lipa", album: "Future Nostalgia", duration: "3:23" },
-    { id: 104, title: "Blinding Lights", artist: "The Weeknd", album: "After Hours", duration: "3:20" },
-  ];
+        const App = () => {
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [volume, setVolume] = useState(70);
 
-  return (
-    <div className="flex flex-col h-screen bg-black text-white font-sans overflow-hidden">
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <aside className="w-64 bg-black p-6 flex flex-col gap-y-6 border-r border-white/10">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-              <div className="w-6 h-6 border-4 border-black rounded-full border-t-transparent animate-spin-slow"></div>
-            </div>
-            <h1 className="text-2xl font-bold tracking-tighter">Spotdetfy</h1>
-          </div>
+            const playlists = [
+                { id: 1, title: "Lofi Beats", desc: "Relax and study", img: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=300&h=300&fit=crop" },
+                { id: 2, title: "Night Drive", desc: "Electronic vibes", img: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=300&h=300&fit=crop" },
+                { id: 3, title: "Deep Focus", desc: "Keep concentration", img: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=300&h=300&fit=crop" },
+                { id: 4, title: "Coffee Mornings", desc: "Acoustic chill", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&h=300&fit=crop" },
+                { id: 5, title: "Rock Classics", desc: "The best anthems", img: "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=300&h=300&fit=crop" }
+            ];
 
-          <nav className="flex flex-col gap-y-4">
-            <NavItem icon={<Home size={24} />} label="Home" active />
-            <NavItem icon={<Search size={24} />} label="Search" />
-            <NavItem icon={<Library size={24} />} label="Your Library" />
-          </nav>
+            return (
+                <div className="flex flex-col h-screen bg-black overflow-hidden">
+                    <div className="flex flex-1 overflow-hidden p-2 gap-2">
+                        {/* Sidebar */}
+                        <aside className="w-64 flex flex-col gap-2">
+                            <div className="bg-neutral-900 rounded-xl p-4 flex flex-col gap-4">
+                                <div className="flex items-center gap-4 text-white hover:text-white transition cursor-pointer px-2">
+                                    <Icons.Home />
+                                    <span className="font-bold">Home</span>
+                                </div>
+                                <div className="flex items-center gap-4 text-neutral-400 hover:text-white transition cursor-pointer px-2">
+                                    <Icons.Search />
+                                    <span className="font-bold">Search</span>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-neutral-900 rounded-xl flex-1 p-4">
+                                <div className="flex items-center gap-4 text-neutral-400 hover:text-white transition cursor-pointer px-2 mb-6">
+                                    <Icons.Library />
+                                    <span className="font-bold">Your Library</span>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="bg-neutral-800 p-4 rounded-lg">
+                                        <p className="font-bold text-sm mb-1">Create your first playlist</p>
+                                        <p className="text-xs text-neutral-400 mb-3">It's easy, we'll help you</p>
+                                        <button className="bg-white text-black text-xs font-bold px-4 py-2 rounded-full hover:scale-105 transition">Create playlist</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </aside>
 
-          <div className="mt-6 flex flex-col gap-y-4">
-            <NavItem icon={<PlusSquare size={24} />} label="Create Playlist" />
-            <NavItem icon={<Heart size={24} className="text-purple-400" />} label="Liked Songs" />
-          </div>
+                        {/* Main UI */}
+                        <main className="flex-1 bg-gradient-to-b from-neutral-800 to-neutral-950 rounded-xl overflow-y-auto relative">
+                            <header className="sticky top-0 glass-header p-4 flex justify-between items-center z-20">
+                                <div className="flex gap-2">
+                                    <div className="w-8 h-8 bg-black/40 rounded-full flex items-center justify-center cursor-pointer text-neutral-400">‹</div>
+                                    <div className="w-8 h-8 bg-black/40 rounded-full flex items-center justify-center cursor-pointer text-neutral-400">›</div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <button className="text-neutral-400 font-bold hover:scale-105 transition text-sm">Sign up</button>
+                                    <button className="bg-white text-black font-bold px-8 py-3 rounded-full hover:scale-105 transition text-sm">Log in</button>
+                                </div>
+                            </header>
 
-          <div className="mt-auto pt-6 border-t border-white/10 text-xs text-gray-400 leading-loose">
-            <p>Cookies • Privacy • Terms</p>
-            <p>© 2026 Spotdetfy AB</p>
-          </div>
-        </aside>
+                            <div className="p-6">
+                                <h2 className="text-3xl font-extrabold mb-6">Spotdetfy Mixes</h2>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                                    {playlists.map(p => (
+                                        <div key={p.id} className="bg-neutral-900/40 p-4 rounded-lg hover:bg-neutral-800 transition cursor-pointer group shadow-xl">
+                                            <div className="relative mb-4">
+                                                <img src={p.img} className="w-full aspect-square object-cover rounded-md shadow-lg" alt={p.title} />
+                                                <button className="absolute bottom-2 right-2 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 hover:scale-105">
+                                                    <Icons.Play className="text-black ml-1" />
+                                                </button>
+                                            </div>
+                                            <h3 className="font-bold mb-1 truncate">{p.title}</h3>
+                                            <p className="text-sm text-neutral-400 line-clamp-2">{p.desc}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </main>
+                    </div>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto bg-gradient-to-b from-neutral-900 to-black p-8 relative">
-          <header className="flex items-center justify-between mb-8 sticky top-0 z-10 bg-transparent backdrop-blur-md py-2">
-            <div className="flex gap-4">
-              <button className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full text-gray-400 hover:text-white transition cursor-not-allowed">&lt;</button>
-              <button className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full text-gray-400 hover:text-white transition cursor-not-allowed">&gt;</button>
-            </div>
-            <div className="flex items-center gap-4">
-              <button className="bg-white text-black px-6 py-2 rounded-full font-bold hover:scale-105 transition active:scale-95">Explore Premium</button>
-              <button className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:scale-105 transition">
-                <span className="text-sm font-bold">JD</span>
-              </button>
-            </div>
-          </header>
+                    {/* Bottom Player */}
+                    <footer className="h-20 px-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4 w-1/4">
+                            <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=60&h=60&fit=crop" className="w-12 h-12 rounded" />
+                            <div>
+                                <div className="text-sm font-semibold hover:underline cursor-pointer">Midnight City</div>
+                                <div className="text-xs text-neutral-400 hover:underline cursor-pointer">M83</div>
+                            </div>
+                            <Icons.Heart className="text-neutral-400 hover:text-white cursor-pointer ml-2" />
+                        </div>
 
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold mb-6">Good evening</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {featuredPlaylists.slice(0, 6).map((playlist) => (
-                <div key={playlist.id} className="flex items-center bg-white/5 hover:bg-white/10 transition group rounded-md overflow-hidden cursor-pointer relative">
-                  <img src={playlist.cover} alt={playlist.title} className="w-20 h-20 shadow-lg" />
-                  <span className="p-4 font-bold">{playlist.title}</span>
-                  <button className="absolute right-4 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-xl opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 text-black">
-                    <Play fill="black" />
-                  </button>
+                        <div className="flex flex-col items-center gap-2 flex-1 max-w-[40%]">
+                            <div className="flex items-center gap-6">
+                                <Icons.SkipBack className="text-neutral-400 hover:text-white cursor-pointer" />
+                                <button 
+                                    onClick={() => setIsPlaying(!isPlaying)}
+                                    className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:scale-105 transition"
+                                >
+                                    {isPlaying ? <Icons.Pause className="text-black" /> : <Icons.Play className="text-black ml-1" />}
+                                </button>
+                                <Icons.SkipForward className="text-neutral-400 hover:text-white cursor-pointer" />
+                            </div>
+                            <div className="flex items-center gap-2 w-full">
+                                <span className="text-[10px] text-neutral-400">1:24</span>
+                                <div className="h-1 flex-1 bg-neutral-800 rounded-full overflow-hidden">
+                                    <div className="bg-white h-full w-1/3 hover:bg-green-500"></div>
+                                </div>
+                                <span className="text-[10px] text-neutral-400">3:45</span>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end items-center gap-3 w-1/4">
+                            <div className="w-24 h-1 bg-neutral-800 rounded-full overflow-hidden">
+                                <div className="bg-white h-full" style={{ width: `${volume}%` }}></div>
+                            </div>
+                        </div>
+                    </footer>
                 </div>
-              ))}
-            </div>
-          </section>
+            );
+        };
 
-          <section className="mb-10">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold hover:underline cursor-pointer">Featured Playlists</h2>
-              <span className="text-sm font-bold text-gray-400 hover:underline cursor-pointer">Show all</span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {featuredPlaylists.map((item) => (
-                <div key={item.id} className="bg-neutral-900/40 p-4 rounded-xl hover:bg-neutral-800/60 transition group cursor-pointer">
-                  <div className="relative mb-4">
-                    <img src={item.cover} alt={item.title} className="w-full aspect-square rounded-lg shadow-2xl" />
-                    <button className="absolute bottom-2 right-2 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-xl opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 text-black">
-                      <Play fill="black" />
-                    </button>
-                  </div>
-                  <h3 className="font-bold truncate mb-1">{item.title}</h3>
-                  <p className="text-sm text-gray-400 line-clamp-2">{item.artist}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-bold mb-6">Recently Played</h2>
-            <div className="w-full">
-              <div className="grid grid-cols-[16px_4fr_3fr_1fr] gap-4 px-4 py-2 text-gray-400 text-sm border-b border-white/10 mb-2 uppercase tracking-wider font-semibold">
-                <span>#</span>
-                <span>Title</span>
-                <span>Album</span>
-                <span className="flex justify-end"><Clock size={16} /></span>
-              </div>
-              {recentTracks.map((track, index) => (
-                <div key={track.id} className="grid grid-cols-[16px_4fr_3fr_1fr] gap-4 px-4 py-3 hover:bg-white/5 rounded-md group items-center cursor-pointer transition">
-                  <span className="text-gray-400 group-hover:text-white">{index + 1}</span>
-                  <div className="flex flex-col">
-                    <span className="text-white font-medium">{track.title}</span>
-                    <span className="text-sm text-gray-400 group-hover:text-white transition">{track.artist}</span>
-                  </div>
-                  <span className="text-sm text-gray-400">{track.album}</span>
-                  <span className="text-sm text-gray-400 flex justify-end">{track.duration}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        </main>
-      </div>
-
-      {/* Player Bar */}
-      <footer className="h-24 bg-black border-t border-white/10 px-4 flex items-center justify-between">
-        <div className="flex items-center gap-4 w-1/3">
-          <img 
-            src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=60&h=60&fit=crop" 
-            alt="Current Track" 
-            className="w-14 h-14 rounded shadow-lg"
-          />
-          <div>
-            <h4 className="text-sm font-bold hover:underline cursor-pointer">Midnight City</h4>
-            <p className="text-xs text-gray-400 hover:underline cursor-pointer hover:text-white transition">M83</p>
-          </div>
-          <Heart size={18} className="text-green-500 ml-4 cursor-pointer" />
-        </div>
-
-        <div className="flex flex-col items-center gap-y-2 w-1/3 max-w-lg">
-          <div className="flex items-center gap-x-6 text-gray-400">
-            <Shuffle size={20} className="hover:text-white transition cursor-pointer" />
-            <SkipBack size={20} className="hover:text-white transition cursor-pointer" fill="currentColor" />
-            <button 
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="w-8 h-8 flex items-center justify-center bg-white rounded-full text-black hover:scale-105 transition active:scale-95"
-            >
-              {isPlaying ? <Pause size={20} fill="black" /> : <Play size={20} fill="black" className="ml-1" />}
-            </button>
-            <SkipForward size={20} className="hover:text-white transition cursor-pointer" fill="currentColor" />
-            <Repeat size={20} className="hover:text-white transition cursor-pointer" />
-          </div>
-          <div className="flex items-center gap-x-2 w-full">
-            <span className="text-xs text-gray-400 min-w-[30px]">1:24</span>
-            <div className="h-1 flex-1 bg-neutral-600 rounded-full group cursor-pointer relative">
-              <div 
-                className="h-full bg-white group-hover:bg-green-500 rounded-full relative" 
-                style={{ width: `${progress}%` }}
-              >
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 shadow-md"></div>
-              </div>
-            </div>
-            <span className="text-xs text-gray-400 min-w-[30px]">4:03</span>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-end gap-x-4 w-1/3">
-          <Volume2 size={20} className="text-gray-400 hover:text-white cursor-pointer" />
-          <div className="w-24 h-1 bg-neutral-600 rounded-full group cursor-pointer">
-            <div className="h-full bg-white group-hover:bg-green-500 rounded-full w-2/3"></div>
-          </div>
-          <MoreHorizontal size={20} className="text-gray-400 hover:text-white cursor-pointer" />
-        </div>
-      </footer>
-    </div>
-  );
-};
-
-const NavItem = ({ icon, label, active = false }) => (
-  <div className={`flex items-center gap-x-4 cursor-pointer transition ${active ? 'text-white font-bold' : 'text-gray-400 hover:text-white'}`}>
-    {icon}
-    <span className="text-sm font-semibold">{label}</span>
-  </div>
-);
-
-export default Spotdetfy;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
