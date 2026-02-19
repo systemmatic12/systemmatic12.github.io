@@ -3,215 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experimental Labs</title>
+    <title>Experiments | Neron's Hub</title>
     <style>
-        /* --- CSS: STYLING THE INTERFACE --- */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: #f8fafc;
-            color: #1e293b;
-            transition: all 0.3s ease;
+        :root { 
+            --sidebar-width: 260px; 
+            --accent: #f59e0b; /* Amber/Orange for "Experimental" */
+            --bg: #f8fafc; 
+            --text: #1e293b; 
         }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
 
-        /* Navigation Bar */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #ffffff;
-            padding: 15px 40px;
-            border-bottom: 1px solid #e2e8f0;
-        }
+        /* Sidebar Navigation */
+        nav { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid #e2e8f0; padding: 2.5rem; position: fixed; height: 100vh; }
+        nav h2 { font-size: 0.85rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 2rem; }
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1.2rem; }
+        nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
+        nav a:hover { color: var(--accent); }
 
-        .nav-links {
-            list-style: none;
-            display: flex;
-            gap: 25px;
-            align-items: center;
-            margin: 0;
-        }
+        /* Main Content */
+        main { margin-left: var(--sidebar-width); flex-grow: 1; padding: 3rem; }
+        h1 { font-size: 2.5rem; color: #0f172a; margin-bottom: 0.5rem; }
+        p.subtitle { color: #64748b; margin-bottom: 3rem; }
 
-        .nav-links a {
-            text-decoration: none;
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        /* The Experimental Tab Design */
-        .tab-experimental a {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            color: white !important;
-            padding: 10px 18px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
-        }
-
-        .tab-experimental a:hover {
-            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .badge {
-            background: rgba(255, 255, 255, 0.2);
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        /* Main Content Area */
-        .content {
-            max-width: 1000px;
-            margin: 60px auto;
-            padding: 0 20px;
-        }
-
-        .labs-header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .labs-header h1 { font-size: 2.5rem; margin-bottom: 10px; }
-        .labs-header p { color: #64748b; font-size: 1.1rem; }
-
-        /* Experimental Feature Cards */
-        .feature-grid {
+        /* --- EXPERIMENT CARDS --- */
+        .lab-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
-        .feature-card {
+        .lab-card {
             background: white;
-            padding: 30px;
+            padding: 2rem;
             border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            transition: transform 0.2s, border-color 0.2s;
+            border: 1px dashed #cbd5e1; /* Dashed border for that "under construction" look */
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .feature-card:hover {
-            border-color: #6366f1;
+        .lab-card:hover {
             transform: translateY(-5px);
+            border: 1px solid var(--accent);
+            background: #fffbeb; /* Very light orange tint */
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.1);
         }
 
-        .feature-card h3 { margin-top: 0; color: #0f172a; }
-        .feature-card p { color: #64748b; line-height: 1.5; margin-bottom: 25px; }
-
-        .toggle-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            background: #f1f5f9;
-            color: #475569;
+        .status-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            display: block;
         }
 
-        .toggle-btn.active {
-            background: #22c55e;
-            color: white;
+        .lab-card h3 { font-size: 1.25rem; margin-bottom: 0.5rem; color: #0f172a; }
+        .lab-card p { font-size: 0.9rem; color: #64748b; margin-bottom: 1.5rem; }
+
+        .redirect-btn {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        /* --- EXPERIMENTAL EFFECTS (CSS TRICKS) --- */
-        body.glass-mode-active .navbar {
-            position: sticky;
-            top: 0;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; padding: 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0; }
+            nav ul { display: flex; flex-wrap: wrap; gap: 15px; }
+            main { margin-left: 0; padding: 1.5rem; }
         }
-
-        body.dark-labs-active {
-            background: #0f172a;
-            color: #f8fafc;
-        }
-        body.dark-labs-active .navbar { background: #1e293b; border-bottom-color: #334155; }
-        body.dark-labs-active .feature-card { background: #1e293b; border-color: #334155; }
-        body.dark-labs-active .feature-card h3 { color: white; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="logo"><strong>FutureStack</strong></div>
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Settings</a></li>
-            <li class="tab-experimental">
-                <a href="#">Labs <span class="badge">BETA</span></a>
-            </li>
+    <nav>
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="index">Home</a></li>
+            <li><a href="games">Games</a></li>
+            <li><a href="guestbook">Guestbook</a></li>
+            <li><a href="journal">Journal</a></li>
+            <li><a href="media">Media</a></li>
+            <li><a href="experimental" style="color: var(--accent);">Experiments</a></li>
         </ul>
     </nav>
 
-    <main class="content">
-        <header class="labs-header">
-            <h1>🧪 Labs</h1>
-            <p>Welcome to the experimental zone. Test-drive new site mechanics before they go live.</p>
-        </header>
+    <main>
+        <h1>Neron's Labs</h1>
+        <p class="subtitle">Where I test new features and broken code.</p>
 
-        <div class="feature-grid">
-            <div class="feature-card">
-                <h3>Midnight Mode</h3>
-                <p>Toggle an experimental deep-sea dark theme for the entire application.</p>
-                <button class="toggle-btn" id="btn-dark-labs" onclick="handleToggle('dark-labs')">Enable Experiment</button>
-            </div>
+        <div class="lab-grid">
+            
+            <a href="https://example.com/experiment-1" class="lab-card">
+                <div>
+                    <span class="status-tag">Status: Working</span>
+                    <h3>New Subdomain Test</h3>
+                    <p>Testing out a new redirect for a private server or project.</p>
+                </div>
+                <div class="redirect-btn">Enter Experiment →</div>
+            </a>
 
-            <div class="feature-card">
-                <h3>Glass Navigation</h3>
-                <p>Applies a frosted glass effect to the header. Modern, sleek, and slightly resource-heavy.</p>
-                <button class="toggle-btn" id="btn-glass-mode" onclick="handleToggle('glass-mode')">Enable Experiment</button>
-            </div>
+            <a href="https://example.com/experiment-2" class="lab-card">
+                <div>
+                    <span class="status-tag">Status: Broken</span>
+                    <h3>WebGL Shader Hub</h3>
+                    <p>Redirecting to a 3D graphics playground. It might crash your browser.</p>
+                </div>
+                <div class="redirect-btn">Enter Experiment →</div>
+            </a>
+
+            <a href="https://example.com/experiment-3" class="lab-card">
+                <div>
+                    <span class="status-tag">Status: Draft</span>
+                    <h3>AI Chat Integration</h3>
+                    <p>Testing out an API connection to a chat interface.</p>
+                </div>
+                <div class="redirect-btn">Enter Experiment →</div>
+            </a>
+
         </div>
     </main>
-
-    <script>
-        // Toggle the feature and save the choice to the user's browser
-        function handleToggle(featureKey) {
-            const bodyClass = `${featureKey}-active`;
-            const button = document.getElementById(`btn-${featureKey}`);
-            
-            // Check if it's currently on or off
-            const isNowActive = document.body.classList.toggle(bodyClass);
-            
-            // Save to localStorage so it stays on when they refresh
-            localStorage.setItem(featureKey, isNowActive);
-            
-            updateButtonState(button, isNowActive);
-        }
-
-        // Helper to keep the button text/color updated
-        function updateButtonState(button, isActive) {
-            if (isActive) {
-                button.innerText = "Disable Experiment";
-                button.classList.add('active');
-            } else {
-                button.innerText = "Enable Experiment";
-                button.classList.remove('active');
-            }
-        }
-
-        // When the page loads, check localStorage for any previously enabled experiments
-        window.addEventListener('DOMContentLoaded', () => {
-            const features = ['dark-labs', 'glass-mode'];
-            
-            features.forEach(key => {
-                const savedState = localStorage.getItem(key) === 'true';
-                if (savedState) {
-                    document.body.classList.add(`${key}-active`);
-                    updateButtonState(document.getElementById(`btn-${key}`), true);
-                }
-            });
-        });
-    </script>
-
 </body>
 </html>
