@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Piano Audio Monitor</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background: #121212; color: white; }
+        button { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007bff; border: none; color: white; border-radius: 5px; }
+        canvas { width: 100%; height: 200px; background: #000; margin-top: 20px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Piano Monitor</h1>
+    <p>Plug in your piano, click start, and you'll hear it through your computer speakers.</p>
+    <button id="startBtn">Start Listening</button>
+    <canvas id="visualizer"></canvas>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const canvas = document.getElementById('visualizer');
+        const canvasCtx = canvas.getContext('2d');
+
+        startBtn.onclick = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(stream);
+                
+                // This line connects the input directly to your output (Speakers)
+                source.connect(audioContext.destination);
+
+                // Setup Visualizer
+                const analyser = audioContext.createAnalyser();
+                source.connect(analyser);
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+
+                function draw() {
+                    requestAnimationFrame(draw);
+                    analyser.getByteFrequencyData(dataArray);
+                    canvasCtx.fillStyle = 'rgb(0, 0, 0)';
+                    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+                    const barWidth = (canvas.width / bufferLength) * 2.5;
+                    let x = 0;
+                    for(let i = 0; i < bufferLength; i++) {
+                        const barHeight = dataArray[i];
+                        canvasCtx.fillStyle = `rgb(50, 150, ${barHeight + 100})`;
+                        canvasCtx.fillRect(x, canvas.height - barHeight/2, barWidth, barHeight/2);
+                        x += barWidth + 1;
+                    }
+                }
+                draw();
+                startBtn.innerText = "Monitoring...";
+                startBtn.disabled = true;
+            } catch (err) {
+                console.error("Error accessing audio:", err);
+                alert("Make sure you gave microphone permissions!");
+            }
+        };
+    </script>
+</body>
+</html>
