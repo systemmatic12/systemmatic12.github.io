@@ -2,21 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>3D Magnet Sandbox</title>
+    <title>3D Power Sandbox</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #0a0a0a; font-family: sans-serif; color: white; }
+        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; color: white; }
         #ui {
             position: absolute; top: 10px; left: 10px;
-            background: rgba(0, 0, 0, 0.8); padding: 15px; border-radius: 8px; width: 200px;
-            border: 1px solid #333; pointer-events: auto; z-index: 10;
+            background: rgba(0, 0, 0, 0.9); padding: 15px; border-radius: 8px; width: 220px;
+            border: 1px solid #444; z-index: 10;
         }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; }
         button {
-            display: block; width: 100%; margin-bottom: 5px; padding: 8px;
-            cursor: pointer; border: none; border-radius: 4px; font-weight: bold;
+            padding: 8px; cursor: pointer; border: none; border-radius: 4px; 
+            font-weight: bold; background: #333; color: white; transition: 0.2s;
         }
-        .btn-spawn { background: #4CAF50; color: white; }
-        .btn-cam { background: #2196F3; color: white; }
-        .active { background: #ffeb3b; color: black; }
+        button:hover { background: #555; }
+        .active-btn { background: #4CAF50 !important; color: white; }
+        .cam-btn { grid-column: span 2; background: #2196F3; }
+        .slider-wrap { margin: 15px 0; border-top: 1px solid #444; padding-top: 10px; }
+        input[type=range] { width: 100%; cursor: pointer; }
         .instr { font-size: 11px; color: #aaa; margin-bottom: 10px; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -26,33 +29,43 @@
 <body>
 
 <div id="ui">
-    <h3>Magnet World</h3>
-    <div class="instr">
-        <b>Hold Left Click:</b> Pull to Mouse<br>
-        <b>Hold Right Click:</b> Push from Mouse<br>
-        <b>Spacebar:</b> Spawn Box
+    <h3>3D Magnet Lab</h3>
+    <div class="instr">Space: Spawn | L-Click: Pull | R-Click: Push</div>
+    
+    <div class="controls">
+        <button id="btn-box" class="active-btn" onclick="setShape('box')">Box</button>
+        <button id="btn-sphere" onclick="setShape('sphere')">Sphere</button>
+        <button id="btn-cone" onclick="setShape('cone')" style="grid-column: span 2;">Cone</button>
+        
+        <div class="slider-wrap" style="grid-column: span 2;">
+            <label>Magnet Power: <span id="powerVal">5</span></label>
+            <input type="range" id="powerSlider" min="1" max="20" value="5" oninput="updatePowerLabel()">
+        </div>
+
+        <button id="camBtn" class="cam-btn" onclick="toggleCamera()">Camera: OFF</button>
+        <button style="grid-column: span 2; background: #f44336;" onclick="clearWorld()">Reset World</button>
     </div>
-    <button class="btn-spawn" onclick="spawnBox()">Spawn Box (Space)</button>
-    <button id="camBtn" class="btn-cam" onclick="toggleCamera()">Camera Mode: OFF</button>
-    <div style="margin: 10px 0;"><input type="checkbox" id="staticToggle"> Static Mode</div>
-    <button style="background:#444; color:white;" onclick="clearWorld()">Clear All</button>
+
+    <label><input type="checkbox" id="staticToggle"> Static (Frozen)</label>
 </div>
 
 <script>
-    // --- Setup Variables ---
+    let currentShape = 'box';
     let isCameraMode = false;
     let isLeftDown = false;
     let isRightDown = false;
+    let magnetPower = 5;
     const objects = [];
     const mouse3D = new THREE.Vector3();
+    const worldSize = 25;
 
-    // --- Scene Setup ---
+    // --- Scene & Physics ---
     const scene = new THREE.Scene();
     const world = new CANNON.World();
-    world.gravity.set(0, -15, 0);
+    world.gravity.set(0, -20, 0);
 
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 30, 40);
+    camera.position.set(0, 40, 50);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -62,100 +75,118 @@
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enabled = false;
 
-    // Lighting
-    scene.add(new THREE.AmbientLight(0x404040));
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(10, 50, 10);
-    light.castShadow = true;
-    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x505050));
+    const sun = new THREE.DirectionalLight(0xffffff, 1);
+    sun.position.set(20, 50, 10);
+    sun.castShadow = true;
+    scene.add(sun);
 
-    // Ground
-    const groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({ color: 0x111111 }));
-    groundMesh.rotation.x = -Math.PI / 2;
-    groundMesh.receiveShadow = true;
-    scene.add(groundMesh);
-    const groundBody = new CANNON.Body({ mass: 0 });
-    groundBody.addShape(new CANNON.Plane());
-    groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
-    world.addBody(groundBody);
+    // --- Bounding Box Setup ---
+    function createWall(x, y, z, w, h, d) {
+        const body = new CANNON.Body({ mass: 0 });
+        body.addShape(new CANNON.Box(new CANNON.Vec3(w/2, h/2, d/2)));
+        body.position.set(x, y, z);
+        world.addBody(body);
+
+        const mesh = new THREE.Mesh(
+            new THREE.BoxGeometry(w, h, d),
+            new THREE.MeshStandardMaterial({ color: 0x333333, transparent: true, opacity: 0.1 })
+        );
+        mesh.position.set(x, y, z);
+        scene.add(mesh);
+    }
+    createWall(0, -0.5, 0, worldSize*2, 1, worldSize*2); // Floor
+    createWall(worldSize, 10, 0, 1, 20, worldSize*2);    // Right
+    createWall(-worldSize, 10, 0, 1, 20, worldSize*2);   // Left
+    createWall(0, 10, worldSize, worldSize*2, 20, 1);    // Back
+    createWall(0, 10, -worldSize, worldSize*2, 20, 1);   // Front
 
     const raycaster = new THREE.Raycaster();
     const mouse2D = new THREE.Vector2();
 
     // --- Functions ---
+    function updatePowerLabel() {
+        magnetPower = document.getElementById('powerSlider').value;
+        document.getElementById('powerVal').innerText = magnetPower;
+    }
+
+    function setShape(type) {
+        currentShape = type;
+        document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active-btn'));
+        const target = document.getElementById('btn-' + type);
+        if(target) target.classList.add('active-btn');
+    }
+
     function toggleCamera() {
         isCameraMode = !isCameraMode;
         controls.enabled = isCameraMode;
-        document.getElementById('camBtn').innerText = `Camera Mode: ${isCameraMode ? 'ON' : 'OFF'}`;
-        document.getElementById('camBtn').classList.toggle('active');
+        document.getElementById('camBtn').innerText = `Camera: ${isCameraMode ? 'ON' : 'OFF'}`;
+        document.getElementById('camBtn').classList.toggle('active-btn');
     }
 
-    function spawnBox() {
+    function spawn() {
         const isStatic = document.getElementById('staticToggle').checked;
-        const size = 1.5;
-        const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(size, size, size), 
-            new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff })
-        );
-        mesh.castShadow = true;
-        
+        const color = Math.random() * 0xffffff;
+        let mesh, shape;
+
+        if (currentShape === 'box') {
+            mesh = new THREE.Mesh(new THREE.BoxGeometry(2,2,2), new THREE.MeshStandardMaterial({ color, emissive: 0x000000 }));
+            shape = new CANNON.Box(new CANNON.Vec3(1,1,1));
+        } else if (currentShape === 'sphere') {
+            mesh = new THREE.Mesh(new THREE.SphereGeometry(1.2, 24, 24), new THREE.MeshStandardMaterial({ color, emissive: 0x000000 }));
+            shape = new CANNON.Sphere(1.2);
+        } else {
+            mesh = new THREE.Mesh(new THREE.ConeGeometry(1.2, 3, 16), new THREE.MeshStandardMaterial({ color, emissive: 0x000000 }));
+            shape = new CANNON.Cylinder(0.01, 1.2, 3, 16); 
+        }
+
         const body = new CANNON.Body({ mass: isStatic ? 0 : 1 });
-        body.addShape(new CANNON.Box(new CANNON.Vec3(size/2, size/2, size/2)));
+        body.addShape(shape);
+        body.position.set(mouse3D.x, 15, mouse3D.z);
         
-        // Spawn at mouse position or center
-        body.position.set(mouse3D.x, 10, mouse3D.z);
-        
+        mesh.castShadow = true;
         scene.add(mesh);
         world.addBody(body);
-        objects.push({ mesh, body });
+        objects.push({ mesh, body, originalColor: color });
     }
 
-    // --- Input Handling ---
     window.addEventListener('mousedown', (e) => {
         if (isCameraMode || e.target.tagName !== 'CANVAS') return;
         if (e.button === 0) isLeftDown = true;
         if (e.button === 2) isRightDown = true;
     });
-
     window.addEventListener('mouseup', () => { isLeftDown = false; isRightDown = false; });
     window.addEventListener('contextmenu', e => e.preventDefault());
-    window.addEventListener('keydown', (e) => { if(e.code === 'Space') spawnBox(); });
+    window.addEventListener('keydown', (e) => { if(e.code === 'Space') spawn(); });
 
     window.addEventListener('mousemove', (e) => {
         mouse2D.x = (e.clientX / window.innerWidth) * 2 - 1;
         mouse2D.y = -(e.clientY / window.innerHeight) * 2 + 1;
-        
-        // Update 3D mouse position by raycasting against ground
         raycaster.setFromCamera(mouse2D, camera);
-        const intersects = raycaster.intersectObject(groundMesh);
-        if (intersects.length > 0) {
-            mouse3D.copy(intersects[0].point);
-        }
+        const intersects = raycaster.intersectObjects(scene.children);
+        if (intersects.length > 0) mouse3D.copy(intersects[0].point);
     });
 
-    function applyMagneticForce() {
-        if (!isLeftDown && !isRightDown) return;
-
+    function applyPhysics() {
         objects.forEach(obj => {
-            if (obj.body.mass === 0) return; // Ignore static objects
+            if (obj.body.mass === 0) return;
+            
+            // Visual Glow effect Reset
+            obj.mesh.material.emissive.setHex(0x000000);
 
-            // Calculate vector from object to mouse
-            const forceDir = new CANNON.Vec3(
-                mouse3D.x - obj.body.position.x,
-                0, // Keep force mostly horizontal for better control
-                mouse3D.z - obj.body.position.z
-            );
+            if (isLeftDown || isRightDown) {
+                const forceDir = new CANNON.Vec3(mouse3D.x - obj.body.position.x, 0, mouse3D.z - obj.body.position.z);
+                const dist = forceDir.norm();
 
-            const distance = forceDir.norm();
-            if (distance < 30) { // Range of magnet
-                forceDir.normalize();
-                const strength = isLeftDown ? 25 : -40; // Pull vs Push
-                
-                // Apply force
-                obj.body.applyForce(forceDir.scale(strength), obj.body.position);
-                
-                // Add a bit of "damping" so they don't fly away forever
-                obj.body.velocity.scale(0.98, obj.body.velocity);
+                if (dist < 40) {
+                    forceDir.normalize();
+                    // Apply Slider Power
+                    const multiplier = isLeftDown ? (magnetPower * 10) : (magnetPower * -15);
+                    obj.body.applyForce(forceDir.scale(multiplier), obj.body.position);
+                    
+                    // Visual "Energy" glow when being moved
+                    obj.mesh.material.emissive.setHex(isLeftDown ? 0x004400 : 0x440000);
+                }
             }
         });
     }
@@ -165,28 +196,17 @@
         objects.length = 0;
     }
 
-    // --- Main Loop ---
     function animate() {
         requestAnimationFrame(animate);
         world.step(1/60);
-        
-        if (!isCameraMode) applyMagneticForce();
-
+        applyPhysics();
         objects.forEach(obj => {
             obj.mesh.position.copy(obj.body.position);
             obj.mesh.quaternion.copy(obj.body.quaternion);
         });
-
         renderer.render(scene, camera);
     }
-
     animate();
-
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
 </script>
 </body>
 </html>
