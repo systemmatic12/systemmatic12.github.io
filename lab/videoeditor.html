@@ -2,170 +2,176 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>QuantumEdit V3 - Multi-Layer Studio</title>
+    <title>QuantumEdit V4 - VFX Studio</title>
     <style>
-        :root { --bg: #0d0d0f; --panel: #16161a; --accent: #00f2ff; --text: #f0f0f0; --border: #2d2d32; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .app-container { display: grid; grid-template-columns: 320px 1fr; grid-template-rows: 1fr 180px; height: 100vh; }
+        :root { --bg: #09090b; --panel: #121216; --accent: #00f2ff; --text: #f0f0f0; --border: #27272a; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .app-container { display: grid; grid-template-columns: 320px 1fr; grid-template-rows: 1fr 220px; height: 100vh; }
         
-        .sidebar { background: var(--panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+        .sidebar { background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
         .preview-area { background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
         .timeline { grid-column: span 2; background: var(--panel); padding: 15px; border-top: 1px solid var(--border); }
 
-        canvas { max-width: 90%; max-height: 75%; border: 1px solid #333; background: #000; }
+        canvas { max-width: 90%; max-height: 70%; border: 1px solid #333; background: #111; border-radius: 8px; }
         
-        .btn { background: var(--accent); color: #000; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; font-size: 12px; }
-        .btn.secondary { background: #333; color: white; margin-top: 5px; }
-        .btn.export { background: #ff3e3e; color: white; margin-top: 20px; }
+        .btn { background: var(--accent); color: #000; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,242,255,0.3); }
+        .btn.export { background: #ff3e3e; color: white; margin-top: 10px; }
         
-        .control-group { background: #1c1c21; padding: 12px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 5px; }
-        label { font-size: 10px; color: #888; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        input[type="text"], input[type="number"] { width: 100%; background: #000; border: 1px solid #444; color: white; padding: 5px; box-sizing: border-box; }
-
-        .track { width: 100%; height: 40px; background: #000; border: 1px solid #333; position: relative; margin-bottom: 5px; cursor: pointer; }
-        #playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; z-index: 10; pointer-events: none; }
+        .control-group { background: #18181b; padding: 10px; border-radius: 6px; border: 1px solid var(--border); }
+        label { font-size: 10px; color: #71717a; text-transform: uppercase; display: block; margin-bottom: 4px; font-weight: bold; }
+        input { width: 100%; background: #000; border: 1px solid #3f3f46; color: white; padding: 4px; border-radius: 4px; }
+        .row { display: flex; gap: 5px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="sidebar">
-        <h3 style="color:var(--accent); margin:0 0 10px 0;">LAYERS</h3>
+        <h3 style="color:var(--accent); margin:0 0 10px 0;">VFX CONTROLS</h3>
         
         <div class="control-group">
-            <label>1. Main Video</label>
-            <input type="file" id="bgVideoInput" accept="video/*">
+            <label>1. Media Layers</label>
+            <input type="file" id="bgIn" accept="video/*" title="Main Video">
+            <input type="file" id="overIn" accept="video/*" style="margin-top:5px;" title="Overlay Video">
         </div>
 
         <div class="control-group">
-            <label>2. Overlay Video (PiP)</label>
-            <input type="file" id="overlayVideoInput" accept="video/*">
+            <label>2. Chroma Key (Green Screen)</label>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <input type="checkbox" id="useChroma" style="width:20px;"> 
+                <span style="font-size:12px;">Enable Green Screen</span>
+            </div>
+            <label style="margin-top:5px;">Sensitivity</label>
+            <input type="range" id="chromaRange" min="50" max="200" value="130">
         </div>
 
         <div class="control-group">
-            <label>3. PNG Overlay / Logo</label>
-            <input type="file" id="imageInput" accept="image/png, image/jpeg">
-        </div>
-
-        <div class="control-group">
-            <label>4. Subtitles / Text</label>
-            <input type="text" id="overlayText" placeholder="Type here...">
-            <div style="display:flex; gap:5px; margin-top:5px;">
-                <input type="number" id="textX" value="50" title="X Position (%)">
-                <input type="number" id="textY" value="80" title="Y Position (%)">
+            <label>3. Crop Main Video (%)</label>
+            <div class="row">
+                <input type="number" id="cropX" value="0" placeholder="X">
+                <input type="number" id="cropW" value="100" placeholder="Width">
             </div>
         </div>
 
-        <button class="btn export" id="exportBtn">SAVE VIDEO</button>
+        <div class="control-group">
+            <label>4. Clipping (In/Out Points)</label>
+            <div class="row">
+                <input type="number" id="clipIn" value="0" step="0.1">
+                <input type="number" id="clipOut" value="10" step="0.1">
+            </div>
+        </div>
+
+        <button class="btn export" id="exportBtn">SAVE MASTERPIECE</button>
         <div id="status" style="font-size:11px; color:var(--accent); text-align:center; margin-top:5px;">Ready</div>
     </div>
 
     <div class="preview-area">
-        <canvas id="editorCanvas"></canvas>
-        <div style="margin-top:15px; display:flex; gap:10px;">
+        <canvas id="c"></canvas>
+        <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
             <button class="btn" id="playBtn" style="width:80px;">PLAY</button>
-            <span id="timecode">00:00.0</span>
+            <span id="tc" style="font-family:monospace; font-size:18px; color:var(--accent)">00:00.0</span>
         </div>
     </div>
 
     <div class="timeline">
-        <label>Seek Timeline</label>
-        <div class="track" id="mainTrack"><div id="playhead"></div></div>
+        <div id="track" style="width:100%; height:60px; background:#000; position:relative; border:1px solid #333; cursor:pointer; border-radius:4px;">
+            <div id="ph" style="position:absolute; top:0; bottom:0; width:2px; background:#fff; z-index:10;"></div>
+            <div id="clipZone" style="position:absolute; height:100%; background:rgba(0,242,255,0.1); border-left:2px solid var(--accent); border-right:2px solid var(--accent);"></div>
+        </div>
     </div>
 </div>
 
-<video id="bgVid" style="display:none" crossOrigin="anonymous"></video>
-<video id="overlayVid" style="display:none" crossOrigin="anonymous" loop muted></video>
-<img id="overlayImg" style="display:none">
+<video id="v1" style="display:none" crossOrigin="anonymous"></video>
+<video id="v2" style="display:none" crossOrigin="anonymous" loop muted></video>
 
 <script>
-    const canvas = document.getElementById('editorCanvas');
-    const ctx = canvas.getContext('2d');
-    const bgVid = document.getElementById('bgVid');
-    const overlayVid = document.getElementById('overlayVid');
-    const overlayImg = document.getElementById('overlayImg');
-    
-    // Inputs
-    const bgInput = document.getElementById('bgVideoInput');
-    const overVidInput = document.getElementById('overlayVideoInput');
-    const imgInput = document.getElementById('imageInput');
-    const textInput = document.getElementById('overlayText');
-    const playBtn = document.getElementById('playBtn');
-
+    const canvas = document.getElementById('c'), ctx = canvas.getContext('2d', {willReadFrequently: true});
+    const v1 = document.getElementById('v1'), v2 = document.getElementById('v2');
+    const playBtn = document.getElementById('playBtn'), ph = document.getElementById('ph');
     let isPlaying = false;
 
     // Loaders
-    bgInput.onchange = e => { bgVid.src = URL.createObjectURL(e.target.files[0]); bgVid.onloadedmetadata = () => { canvas.width = bgVid.videoWidth; canvas.height = bgVid.videoHeight; render(); }};
-    overVidInput.onchange = e => { overlayVid.src = URL.createObjectURL(e.target.files[0]); overlayVid.play(); };
-    imgInput.onchange = e => { overlayImg.src = URL.createObjectURL(e.target.files[0]); };
+    document.getElementById('bgIn').onchange = e => { v1.src = URL.createObjectURL(e.target.files[0]); v1.onloadedmetadata = () => { canvas.width = v1.videoWidth; canvas.height = v1.videoHeight; document.getElementById('clipOut').value = v1.duration.toFixed(1); render(); }};
+    document.getElementById('overIn').onchange = e => { v2.src = URL.createObjectURL(e.target.files[0]); v2.play(); };
 
-    // Core Rendering Engine (The "Stack")
     function render() {
-        // Layer 1: Background Video
-        ctx.drawImage(bgVid, 0, 0, canvas.width, canvas.height);
+        if (!v1.src) return;
 
-        // Layer 2: Overlay Video (Small Corner)
-        if (overlayVid.src) {
-            ctx.drawImage(overlayVid, 20, 20, canvas.width/4, canvas.height/4);
+        // 1. Clipping Logic
+        if (v1.currentTime < document.getElementById('clipIn').value) v1.currentTime = document.getElementById('clipIn').value;
+        if (v1.currentTime >= document.getElementById('clipOut').value) { stop(); return; }
+
+        // 2. Draw Main Video with CROP
+        const cX = (document.getElementById('cropX').value / 100) * v1.videoWidth;
+        const cW = (document.getElementById('cropW').value / 100) * v1.videoWidth;
+        ctx.drawImage(v1, cX, 0, cW, v1.videoHeight, 0, 0, canvas.width, canvas.height);
+
+        // 3. Draw Overlay with CHROMA KEY
+        if (v2.src) {
+            // Draw overlay to a small offscreen area first or just process it
+            ctx.drawImage(v2, 20, 20, canvas.width/3, canvas.height/3);
+            
+            if (document.getElementById('useChroma').checked) {
+                let frame = ctx.getImageData(20, 20, canvas.width/3, canvas.height/3);
+                let l = frame.data.length / 4;
+                let sensitivity = document.getElementById('chromaRange').value;
+
+                for (let i = 0; i < l; i++) {
+                    let r = frame.data[i * 4 + 0];
+                    let g = frame.data[i * 4 + 1];
+                    let b = frame.data[i * 4 + 2];
+                    // If pixel is "Greenish"
+                    if (g > sensitivity && g > r && g > b) {
+                        frame.data[i * 4 + 3] = 0; // Make transparent
+                    }
+                }
+                ctx.putImageData(frame, 20, 20);
+            }
         }
 
-        // Layer 3: PNG Image
-        if (overlayImg.src) {
-            ctx.drawImage(overlayImg, canvas.width - (canvas.width/4) - 20, 20, canvas.width/4, canvas.height/4);
-        }
-
-        // Layer 4: Text Overlay
-        if (textInput.value) {
-            ctx.fillStyle = "white";
-            ctx.strokeStyle = "black";
-            ctx.lineWidth = 4;
-            ctx.font = `${canvas.height/15}px Impact`;
-            ctx.textAlign = "center";
-            const tx = (document.getElementById('textX').value / 100) * canvas.width;
-            const ty = (document.getElementById('textY').value / 100) * canvas.height;
-            ctx.strokeText(textInput.value, tx, ty);
-            ctx.fillText(textInput.value, tx, ty);
-        }
-
-        // UI Updates
-        document.getElementById('playhead').style.left = (bgVid.currentTime / bgVid.duration) * 100 + "%";
-        document.getElementById('timecode').innerText = bgVid.currentTime.toFixed(1) + "s";
-
+        // Update UI
+        ph.style.left = (v1.currentTime / v1.duration) * 100 + "%";
+        document.getElementById('tc').innerText = v1.currentTime.toFixed(1) + "s";
         if (isPlaying) requestAnimationFrame(render);
     }
 
-    // Controls
+    function stop() { v1.pause(); v2.pause(); isPlaying = false; playBtn.innerText = "PLAY"; }
+    
     playBtn.onclick = () => {
-        if (bgVid.paused) { bgVid.play(); overlayVid.play(); isPlaying = true; playBtn.innerText = "PAUSE"; render(); }
-        else { bgVid.pause(); overlayVid.pause(); isPlaying = false; playBtn.innerText = "PLAY"; }
+        if (v1.paused) { v1.play(); v2.play(); isPlaying = true; playBtn.innerText = "PAUSE"; render(); }
+        else { stop(); }
     };
 
-    document.getElementById('mainTrack').onclick = (e) => {
+    document.getElementById('track').onclick = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        bgVid.currentTime = ((e.clientX - rect.left) / rect.width) * bgVid.duration;
+        v1.currentTime = ((e.clientX - rect.left) / rect.width) * v1.duration;
         render();
     };
 
-    // Export Logic
+    // EXPORT
     document.getElementById('exportBtn').onclick = () => {
         const stream = canvas.captureStream(30);
-        const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+        const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: 8000000 });
         const chunks = [];
-        bgVid.currentTime = 0;
-        bgVid.play();
-        isPlaying = true;
-        render();
+        v1.currentTime = document.getElementById('clipIn').value;
+        v1.play(); isPlaying = true; render();
         recorder.ondataavailable = e => chunks.push(e.data);
         recorder.onstop = () => {
             const blob = new Blob(chunks, { type: 'video/webm' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'quantum-masterpiece.webm';
+            a.download = 'quantum_export.webm';
             a.click();
         };
         recorder.start();
-        document.getElementById('status').innerText = "🔴 RECORDING...";
-        bgVid.onended = () => { recorder.stop(); document.getElementById('status').innerText = "DONE!"; };
+        document.getElementById('status').innerText = "🔴 RENDERING...";
+        const check = setInterval(() => {
+            if (v1.currentTime >= document.getElementById('clipOut').value) {
+                recorder.stop(); stop(); clearInterval(check);
+                document.getElementById('status').innerText = "SAVED!";
+            }
+        }, 100);
     };
 </script>
 </body>
