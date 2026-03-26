@@ -2,204 +2,234 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>3D Physics Sandbox</title>
+    <title>3D Sculpt & Physics Sandbox</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: sans-serif; }
+        body { margin: 0; overflow: hidden; background: #111; font-family: 'Segoe UI', sans-serif; color: white; }
         canvas { display: block; }
-        
-        /* User Interface Styling */
         #ui {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            width: 200px;
+            position: absolute; top: 15px; left: 15px;
+            background: rgba(0, 0, 0, 0.8); padding: 15px; border-radius: 10px; width: 220px;
+            border: 1px solid #444; pointer-events: auto;
         }
-        h3 { margin-top: 0; text-align: center; color: #333; }
         button {
-            display: block;
-            width: 100%;
-            margin-bottom: 12px;
-            padding: 12px;
-            cursor: pointer;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 14px;
-            transition: background 0.2s;
+            display: block; width: 100%; margin-bottom: 8px; padding: 10px;
+            cursor: pointer; border: none; border-radius: 4px; font-weight: bold;
         }
-        button:hover { background: #45a049; }
-        .danger { background: #f44336; }
-        .danger:hover { background: #d32f2f; }
+        .btn-spawn { background: #4CAF50; color: white; }
+        .btn-sculpt { background: #FF9800; color: white; }
+        .btn-special { background: #9C27B0; color: white; }
+        .btn-cam { background: #2196F3; color: white; }
+        .active { outline: 3px solid #fff; }
+        #sculpt-ui {
+            display: none; position: absolute; bottom: 20px; left: 50%;
+            transform: translateX(-50%); background: rgba(0,0,0,0.8);
+            padding: 15px; border-radius: 10px; text-align: center;
+        }
     </style>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
 
 <div id="ui">
     <h3>3D Sandbox</h3>
-    <button onclick="addBox()">Drop Box</button>
-    <button onclick="addSphere()">Drop Sphere</button>
-    <button class="danger" onclick="clearWorld()">Clear World</button>
+    <button class="btn-spawn" onclick="setMode('box')">Spawn: Box</button>
+    <button class="btn-spawn" onclick="setMode('sphere')">Spawn: Sphere</button>
+    <button class="btn-sculpt" onclick="toggleSculptMode()">Open Sculptor</button>
+    
+    <div style="margin: 10px 0;">
+        <input type="checkbox" id="staticToggle"> Static (Frozen)
+    </div>
+
+    <button id="camBtn" class="btn-cam" onclick="toggleCamera()">Camera: OFF</button>
+    <button class="btn-special" onclick="blackHole()">CORE COLLAPSE</button>
+    <button style="background:#555; color:white;" onclick="clearWorld()">Clear All</button>
+</div>
+
+<div id="sculpt-ui">
+    <p>Click the Ghost Grid to build. Click a block to remove it.</p>
+    <button class="btn-spawn" onclick="spawnSculpt()">Spawn My Creation!</button>
+    <button style="background:#f44336; color:white;" onclick="toggleSculptMode()">Cancel</button>
 </div>
 
 <script>
-    // ==========================================
-    // 1. SETUP THREE.JS (The Visuals)
-    // ==========================================
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
+    let mode = 'box';
+    let isCameraMode = false;
+    let isSculptMode = false;
+    let sculptVoxels = [];
+    const objects = [];
 
-    // Set up a camera looking down at the center
+    // --- SETUP ---
+    const scene = new THREE.Scene();
+    const world = new CANNON.World();
+    world.gravity.set(0, -15, 0);
+
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 25, 40);
-    camera.lookAt(0, 0, 0);
+    camera.position.set(30, 30, 30);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true; // Enable shadows!
+    renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    // Add Lights so we can see the shapes and shadows
-    scene.add(new THREE.AmbientLight(0x404040)); // Soft base light
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    dirLight.position.set(10, 20, 10);
-    dirLight.castShadow = true;
-    dirLight.shadow.camera.top = 20;
-    dirLight.shadow.camera.bottom = -20;
-    dirLight.shadow.camera.left = -20;
-    dirLight.shadow.camera.right = 20;
-    scene.add(dirLight);
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enabled = false;
 
-    // ==========================================
-    // 2. SETUP CANNON.JS (The Physics)
-    // ==========================================
-    const world = new CANNON.World();
-    world.gravity.set(0, -9.82, 0); // Standard Earth gravity pointing down
-    world.broadphase = new CANNON.NaiveBroadphase();
-    
-    // Array to keep track of our shapes so we can sync them
-    const objectsToUpdate = [];
+    scene.add(new THREE.AmbientLight(0x606060));
+    const sun = new THREE.DirectionalLight(0xffffff, 1);
+    sun.position.set(20, 50, 20);
+    sun.castShadow = true;
+    scene.add(sun);
 
-    // ==========================================
-    // 3. CREATE THE GROUND FLOOR
-    // ==========================================
-    // Visual Ground (Three.js)
-    const groundGeo = new THREE.PlaneGeometry(100, 100);
-    const groundMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
-    const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+    // Ground
+    const groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({ color: 0x1a1a1a }));
     groundMesh.rotation.x = -Math.PI / 2;
     groundMesh.receiveShadow = true;
     scene.add(groundMesh);
-
-    // Physics Ground (Cannon.js)
-    const groundShape = new CANNON.Plane();
-    const groundBody = new CANNON.Body({ mass: 0 }); // Mass 0 makes it completely solid/static
-    groundBody.addShape(groundShape);
+    const groundBody = new CANNON.Body({ mass: 0 });
+    groundBody.addShape(new CANNON.Plane());
     groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
     world.addBody(groundBody);
 
-    // ==========================================
-    // 4. INTERACTIVE FUNCTIONS
-    // ==========================================
-    function getRandomColor() {
-        return Math.random() * 0xffffff;
+    // Sculpting Grid (Ghost)
+    const sculptGroup = new THREE.Group();
+    const gridHelper = new THREE.GridHelper(10, 10, 0x00ff00, 0x444444);
+    sculptGroup.add(gridHelper);
+    sculptGroup.position.y = 5;
+    sculptGroup.visible = false;
+    scene.add(sculptGroup);
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    // --- LOGIC ---
+    function setMode(m) { mode = m; }
+
+    function toggleCamera() {
+        isCameraMode = !isCameraMode;
+        controls.enabled = isCameraMode;
+        document.getElementById('camBtn').innerText = `Camera: ${isCameraMode ? 'ON' : 'OFF'}`;
     }
 
-    function addBox() {
-        const size = 2;
-        
-        // 1. Create the visual box
-        const geo = new THREE.BoxGeometry(size, size, size);
-        const mat = new THREE.MeshStandardMaterial({ color: getRandomColor() });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.castShadow = true;
-        scene.add(mesh);
-
-        // 2. Create the physics box (Cannon uses half-extents)
-        const shape = new CANNON.Box(new CANNON.Vec3(size/2, size/2, size/2));
-        const body = new CANNON.Body({ mass: 1 }); // Mass 1 makes it fall
-        body.addShape(shape);
-        
-        // Spawn randomly in the air
-        body.position.set((Math.random() - 0.5) * 10, 20, (Math.random() - 0.5) * 10);
-        body.quaternion.setFromEuler(Math.random() * Math.PI, Math.random() * Math.PI, 0);
-        
-        world.addBody(body);
-        objectsToUpdate.push({ mesh, body }); // Link them together
+    function toggleSculptMode() {
+        isSculptMode = !isSculptMode;
+        sculptGroup.visible = isSculptMode;
+        document.getElementById('sculpt-ui').style.display = isSculptMode ? 'block' : 'none';
+        if (!isSculptMode) clearSculpt();
     }
 
-    function addSphere() {
-        const radius = 1.2;
+    function clearSculpt() {
+        sculptVoxels.forEach(v => sculptGroup.remove(v));
+        sculptVoxels = [];
+    }
+
+    function spawnSculpt() {
+        if (sculptVoxels.length === 0) return;
         
-        // Visuals
-        const geo = new THREE.SphereGeometry(radius, 32, 32);
-        const mat = new THREE.MeshStandardMaterial({ color: getRandomColor() });
-        const mesh = new THREE.Mesh(geo, mat);
+        const compoundBody = new CANNON.Body({ mass: document.getElementById('staticToggle').checked ? 0 : sculptVoxels.length });
+        const visualGroup = new THREE.Group();
+        
+        sculptVoxels.forEach(v => {
+            // Add to Physics
+            const shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+            compoundBody.addShape(shape, new CANNON.Vec3(v.position.x, v.position.y - 5, v.position.z));
+            
+            // Add to Visuals
+            const clone = v.clone();
+            visualGroup.add(clone);
+        });
+
+        compoundBody.position.set(0, 15, 0);
+        scene.add(visualGroup);
+        world.addBody(compoundBody);
+        objects.push({ mesh: visualGroup, body: compoundBody });
+        
+        toggleSculptMode();
+    }
+
+    function blackHole() {
+        objects.forEach(obj => {
+            if (obj.body.mass === 0) return;
+            const dir = new CANNON.Vec3(0 - obj.body.position.x, 5 - obj.body.position.y, 0 - obj.body.position.z);
+            dir.normalize();
+            obj.body.velocity.set(dir.x * 20, dir.y * 20, dir.z * 20);
+        });
+    }
+
+    window.addEventListener('mousedown', (e) => {
+        if (isCameraMode || e.target.tagName !== 'CANVAS') return;
+        
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+
+        if (isSculptMode) {
+            const intersects = raycaster.intersectObjects([gridHelper, ...sculptVoxels]);
+            if (intersects.length > 0) {
+                const intersect = intersects[0];
+                if (intersect.object === gridHelper) {
+                    // Place voxel
+                    const voxel = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 0xFF9800 }));
+                    voxel.position.copy(intersect.point).add(intersect.face.normal);
+                    voxel.position.divideScalar(1).floor().addScalar(0.5);
+                    sculptGroup.add(voxel);
+                    sculptVoxels.push(voxel);
+                } else {
+                    // Remove voxel
+                    sculptGroup.remove(intersect.object);
+                    sculptVoxels = sculptVoxels.filter(v => v !== intersect.object);
+                }
+            }
+        } else {
+            const intersects = raycaster.intersectObject(groundMesh);
+            if (intersects.length > 0 && e.button === 0) spawnDefault(intersects[0].point);
+        }
+    });
+
+    function spawnDefault(pt) {
+        const isStatic = document.getElementById('staticToggle').checked;
+        const color = Math.random() * 0xffffff;
+        let mesh, shape;
+
+        if (mode === 'box') {
+            mesh = new THREE.Mesh(new THREE.BoxGeometry(2,2,2), new THREE.MeshStandardMaterial({ color, roughness: 0.1 }));
+            shape = new CANNON.Box(new CANNON.Vec3(1,1,1));
+        } else {
+            mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), new THREE.MeshStandardMaterial({ color, metalness: 0.7 }));
+            shape = new CANNON.Sphere(1);
+        }
+
+        const body = new CANNON.Body({ mass: isStatic ? 0 : 1 });
+        body.addShape(shape);
+        body.position.set(pt.x, pt.y + 2, pt.z);
         mesh.castShadow = true;
         scene.add(mesh);
-
-        // Physics
-        const shape = new CANNON.Sphere(radius);
-        const body = new CANNON.Body({ mass: 1 });
-        body.addShape(shape);
-        
-        // Spawn randomly in the air
-        body.position.set((Math.random() - 0.5) * 10, 20, (Math.random() - 0.5) * 10);
-        
         world.addBody(body);
-        objectsToUpdate.push({ mesh, body });
+        objects.push({ mesh, body });
     }
 
     function clearWorld() {
-        for (let obj of objectsToUpdate) {
-            scene.remove(obj.mesh);
-            world.remove(obj.body);
-        }
-        objectsToUpdate.length = 0;
+        objects.forEach(obj => { scene.remove(obj.mesh); world.remove(obj.body); });
+        objects.length = 0;
     }
 
-    // Keep the game full screen if the window is resized
+    function animate() {
+        requestAnimationFrame(animate);
+        world.step(1/60);
+        objects.forEach(obj => {
+            obj.mesh.position.copy(obj.body.position);
+            obj.mesh.quaternion.copy(obj.body.quaternion);
+        });
+        renderer.render(scene, camera);
+    }
+
+    animate();
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
-
-    // ==========================================
-    // 5. THE ANIMATION LOOP
-    // ==========================================
-    const clock = new THREE.Clock();
-    let oldElapsedTime = 0;
-
-    function animate() {
-        requestAnimationFrame(animate);
-
-        const elapsedTime = clock.getElapsedTime();
-        const deltaTime = elapsedTime - oldElapsedTime;
-        oldElapsedTime = elapsedTime;
-
-        // Step the physics engine forward in time
-        world.step(1 / 60, deltaTime, 3);
-
-        // Copy the physics coordinates over to the visual graphics
-        for (const object of objectsToUpdate) {
-            object.mesh.position.copy(object.body.position);
-            object.mesh.quaternion.copy(object.body.quaternion);
-        }
-
-        renderer.render(scene, camera);
-    }
-
-    // Start the loop!
-    animate();
 </script>
 </body>
 </html>
