@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>P2P Racing Game</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        body { margin: 0; background: #222; color: white; font-family: sans-serif; overflow: hidden; touch-action: none; }
+        canvas { display: block; background: #444; margin: 0 auto; max-width: 100vw; max-height: 80vh; }
+        #ui { padding: 10px; text-align: center; }
+        .controls { display: flex; justify-content: center; gap: 20px; padding: 20px; }
+        .btn { width: 60px; height: 60px; background: #666; border-radius: 50%; display: flex; align-items: center; justify-content: center; user-select: none; }
+        #peer-id-display { font-weight: bold; color: #0f0; }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <div id="setup">
+        <p>Your ID: <span id="peer-id-display">Connecting...</span></p>
+        <input type="text" id="join-id" placeholder="Enter Friend's ID">
+        <button onclick="connectToPeer()">Join Room</button>
+    </div>
+    <div id="status">Wait for ID, then share it with a friend!</div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<div class="controls" id="mobile-ctrl">
+    <div class="btn" id="btn-left">◀️</div>
+    <div class="btn" id="btn-up">▲</div>
+    <div class="btn" id="btn-right">▶️</div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 800;
+    canvas.height = 600;
+
+    // --- Networking Logic ---
+    const peer = new Peer();
+    let conn;
+    let peerIdDisplay = document.getElementById('peer-id-display');
+    let players = {}; // Stores all car positions
+    let myId;
+
+    peer.on('open', (id) => {
+        myId = id;
+        peerIdDisplay.innerText = id;
+        players[id] = { x: 100, y: 100, angle: 0, color: 'red' };
+    });
+
+    // Handle incoming connections
+    peer.on('connection', (connection) => {
+        conn = connection;
+        setupDataListener();
+    });
+
+    function connectToPeer() {
+        const targetId = document.getElementById('join-id').value;
+        conn = peer.connect(targetId);
+        setupDataListener();
+    }
+
+    function setupDataListener() {
+        conn.on('data', (data) => {
+            players[data.id] = data;
+        });
+    }
+
+    // --- Game Logic ---
+    const car = { x: 100, y: 100, angle: 0, speed: 0, accel: 0.2, friction: 0.95, turnSpeed: 0.05 };
+    const keys = {};
+
+    // Mobile Input
+    const touch = { left: false, right: false, up: false };
+    document.getElementById('btn-left').ontouchstart = () => touch.left = true;
+    document.getElementById('btn-left').ontouchend = () => touch.left = false;
+    document.getElementById('btn-right').ontouchstart = () => touch.right = true;
+    document.getElementById('btn-right').ontouchend = () => touch.right = false;
+    document.getElementById('btn-up').ontouchstart = () => touch.up = true;
+    document.getElementById('btn-up').ontouchend = () => touch.up = false;
+
+    window.onkeydown = (e) => keys[e.key] = true;
+    window.onkeyup = (e) => keys[e.key] = false;
+
+    function update() {
+        // Movement logic
+        if (keys['ArrowUp'] || touch.up) car.speed += car.accel;
+        if (keys['ArrowLeft'] || touch.left) car.angle -= car.turnSpeed;
+        if (keys['ArrowRight'] || touch.right) car.angle += car.turnSpeed;
+
+        car.speed *= car.friction;
+        car.x += Math.cos(car.angle) * car.speed;
+        car.y += Math.sin(car.angle) * car.speed;
+
+        // Sync local car to players object
+        if (myId) {
+            players[myId] = { id: myId, x: car.x, y: car.y, angle: car.angle, color: 'red' };
+            // Send data to peer
+            if (conn && conn.open) {
+                conn.send(players[myId]);
+            }
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw Track (Simple Border)
+        ctx.strokeStyle = "white";
+        ctx.strokeRect(50, 50, 700, 500);
+
+        // Draw all players
+        for (let id in players) {
+            const p = players[id];
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.angle);
+            ctx.fillStyle = (id === myId) ? 'red' : 'cyan';
+            ctx.fillRect(-15, -10, 30, 20); // Car body
+            ctx.fillStyle = "black";
+            ctx.fillRect(10, -8, 5, 16); // Windshield
+            ctx.restore();
+        }
+        requestAnimationFrame(() => {
+            update();
+            draw();
+        });
+    }
+
+    draw();
+</script>
+</body>
+</html>
